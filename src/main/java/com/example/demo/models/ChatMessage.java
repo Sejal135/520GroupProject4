@@ -2,12 +2,14 @@ package com.example.demo.models;
 
 import lombok.*;
 
-@Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatMessage {
+
+    private String roomId;
 
     private String content;
 
