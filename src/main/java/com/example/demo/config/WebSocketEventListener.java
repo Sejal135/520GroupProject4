@@ -4,7 +4,6 @@ package com.example.demo.config;
 import com.example.demo.models.ChatMessage;
 import com.example.demo.models.MessageType;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -13,7 +12,6 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class WebSocketEventListener {
 
     private final SimpMessageSendingOperations messageTemplate;
@@ -24,10 +22,10 @@ public class WebSocketEventListener {
     ) {
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String username = (String) stompHeaderAccessor.getSessionAttributes().get("username");
+        String roomcode = (String) stompHeaderAccessor.getSessionAttributes().get("roomcode");
         if (username != null) {
-            log.info("User disconnected: {}", username);
             var chatMessage = ChatMessage.builder().type(MessageType.LEAVE).sender(username).build();
-            messageTemplate.convertAndSend("/topic/public", chatMessage);
+            messageTemplate.convertAndSend("/topic/" + roomcode, chatMessage);
         }
     }
 }
