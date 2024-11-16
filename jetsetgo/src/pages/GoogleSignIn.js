@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import jwtDecode from "jwt-decode";
 
 function GoogleSignIn() {
   const [isLibraryLoaded, setIsLibraryLoaded] = useState(false);
@@ -6,7 +7,13 @@ function GoogleSignIn() {
   /* Callback function to handle the credential response */
   const handleCredentialResponse = (response) => {
     console.log("Encoded JWT ID token: " + response.credential);
-    // Here, you would send the JWT ID token to your server for verification
+
+    // Decode the JWT token
+    const userObject = jwtDecode(response.credential);
+    console.log("Decoded User Info: ", userObject);
+
+    // Redirect to another page after successful sign-in
+    window.location.href = "/Profile"; // Example redirect
   };
 
   useEffect(() => {
