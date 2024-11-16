@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plane, LogIn } from 'lucide-react';
-import GoogleSignIn from './GoogleSignIn';
+import GoogleSignIn from './pages/GoogleSignIn';
 
 function App() {
   return (
