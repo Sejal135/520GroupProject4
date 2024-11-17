@@ -90,7 +90,7 @@ function GoogleSignIn() {
     script.onload = () => {
       if (window.google && window.google.accounts) {
         window.google.accounts.id.initialize({
-          client_id: "YOUR_GOOGLE_CLIENT_ID",
+          client_id: "61729881345-lhduvocsq48944422u7id4h8v9iohd58.apps.googleusercontent.com",
           callback: handleCredentialResponse,
         });
         setIsLibraryLoaded(true); // Indicate that the library has loaded
