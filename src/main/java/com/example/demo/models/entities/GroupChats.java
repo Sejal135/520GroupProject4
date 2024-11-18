@@ -21,7 +21,7 @@ public class GroupChats {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "group_id")
-    private int groupId;
+    private Integer groupId;
 
 
     @Column(name = "created_at", nullable = false)

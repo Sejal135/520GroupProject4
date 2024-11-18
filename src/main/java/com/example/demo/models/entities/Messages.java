@@ -21,7 +21,7 @@ public class Messages {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "message_id")
-    private int messageId;
+    private Integer messageId;
 
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
