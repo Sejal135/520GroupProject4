@@ -20,7 +20,7 @@ class GroupMembers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
-    private int memberId;
+    private Integer memberId;
 
     @Column(name = "joined_at", nullable = false)
     private Date joinedAt;

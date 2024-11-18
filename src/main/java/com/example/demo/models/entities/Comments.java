@@ -19,7 +19,7 @@ public class Comments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
-    private int comment_id;
+    private Integer comment_id;
 
     @Column(name = "comment_timestamp", nullable = false)
     private Date commentTimestamp;

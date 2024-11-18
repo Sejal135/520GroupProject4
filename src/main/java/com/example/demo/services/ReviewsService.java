@@ -43,7 +43,28 @@ public class ReviewsService {
     }
 
     @Transactional
+    public List<Reviews> FindAllReviewsForUser(int userId) {
+        String hql =
+                "From Reviews reviews " +
+                        "JOIN Users users on users = reviews.reviewerId " +
+                        "where users.userId = :userId";
+        return entityManager.createQuery(hql, Reviews.class).setParameter("userId", userId).getResultList();
+    }
+
+    @Transactional
     public String AddReviewToDatabase(String title, int userId, int placeId, String reviewContents) {
+
+        String hql =
+                "From Reviews reviews " +
+                        "JOIN Users users on users = reviews.reviewerId " +
+                        "JOIN Places places on reviews.placeId = places " +
+                        "where users.userId = :userId and places.placeId = :placeId";
+
+        List<Reviews> reviews = entityManager.createQuery(hql, Reviews.class).setParameter("userId", userId).setParameter("placeId", placeId).getResultList();
+        if (!reviews.isEmpty()) {
+            return "User already has review on this place";
+        }
+
         Reviews review = new Reviews();
         review.setTitle(title);
         review.setReview(reviewContents);
@@ -67,6 +88,5 @@ public class ReviewsService {
         reviewsRepository.deleteById(reviewId);
         return "Successfullly removed review from repository.";
     }
-
 
 }

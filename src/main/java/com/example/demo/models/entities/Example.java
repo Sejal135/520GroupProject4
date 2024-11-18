@@ -9,14 +9,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "Places")
-public class Places {
+@Table(name = "Example")
+public class Example {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "place_id")
-    private Integer placeId;
+    @Column(name = "example_id")
+    private Integer exampleId;
 
-    @Column(name = "place_name", nullable = false)
-    private String placeName;
+    @Column(name = "example_column")
+    private String example;
+
 }

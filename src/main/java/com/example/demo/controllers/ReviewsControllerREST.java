@@ -18,14 +18,20 @@ public class ReviewsControllerREST {
         return reviewsService.FindAllReviewsForPlace(placeId);
     }
 
+    @GetMapping("/GetAllReviewsForAUser")
+    public List<Reviews> GetAllReviewsForAUser(@RequestParam int userId) {
+        return reviewsService.FindAllReviewsForUser(userId);
+    }
+
     @PostMapping("/AddReviewToDatabase")
     public String AddReviewToDatabase(@RequestParam String title, @RequestParam int userId, int placeId, String reviewContents) {
-        reviewsService.AddReviewToDatabase(title, userId, placeId, reviewContents);
-        return "Hello";
+        return reviewsService.AddReviewToDatabase(title, userId, placeId, reviewContents);
     }
 
     @DeleteMapping("/DeleteReview")
     public String DeleteReviewFromDatabase(@RequestParam int reviewId) {
         return reviewsService.DeleteReviewFromDatabase(reviewId);
     }
+
+
 }

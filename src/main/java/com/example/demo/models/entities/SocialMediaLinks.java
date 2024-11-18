@@ -9,14 +9,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "Places")
-public class Places {
+@Table(name = "social_media_links")
+public class SocialMediaLinks {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "place_id")
-    private Integer placeId;
+    @Column(name = "social_media_links_id")
+    private Integer socialMedialLinksId;
 
-    @Column(name = "place_name", nullable = false)
-    private String placeName;
+    @Column(name = "linkedin_link")
+    private String linkedInLink;
 }
