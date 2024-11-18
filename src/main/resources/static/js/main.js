@@ -1,5 +1,7 @@
 'use strict';
 
+import supabase from "./supabaseClient.js";
+
 var usernamePage = document.querySelector('#username-page');
 var chatPage = document.querySelector('#chat-page');
 var usernameForm = document.querySelector('#usernameForm');
@@ -38,11 +40,16 @@ function onConnected() {
     // Subscribe to the Public Topic
     stompClient.subscribe('/topic/' + roomcode, onMessageReceived);
 
+    //load previous chat history
+    renderMessages(roomcode)
+
     // Tell your username to the server
     stompClient.send("/app/chat.addUser/" + roomcode,
         {},
         JSON.stringify({roomId: "public", sender: username, type: 'JOIN'})
     )
+
+    
 
     connectingElement.classList.add('hidden');
 }
@@ -53,26 +60,31 @@ function onError(error) {
     connectingElement.style.color = 'red';
 }
 
+//stores a message
+function storeMessage(messageContent, roomCode, roomId, type, username){
+const store = async () => {
+    const { data, error } = await supabase
+    .from('messages_test')  // Table name in your Supabase database
+    .insert([
+        { 
+            content: messageContent, 
+            room_id: roomId, 
+            username: username, 
+            type: type,
+            room_code: roomCode
+        }
+    ]);
 
-function sendMessage(event) {
-    var messageContent = messageInput.value.trim();
-    if(messageContent && stompClient) {
-        var chatMessage = {
-            roomId: "public",
-            sender: username,
-            content: messageInput.value,
-            type: 'CHAT'
-        };
-        stompClient.send("/app/chat.sendMessage/" + roomcode, {}, JSON.stringify(chatMessage));
-        messageInput.value = '';
+if (error) {
+    console.error('Error inserting message:', error);
+} else {
+    console.log('Message inserted:', data);
     }
-    event.preventDefault();
+  }
+  store();
 }
 
-
-function onMessageReceived(payload) {
-    var message = JSON.parse(payload.body);
-
+ function renderMessage(message){
     var messageElement = document.createElement('li');
 
     if(message.type === 'JOIN') {
@@ -105,6 +117,83 @@ function onMessageReceived(payload) {
 
     messageArea.appendChild(messageElement);
     messageArea.scrollTop = messageArea.scrollHeight;
+}
+
+function renderMessages(roomCode){
+    const fetchMessages = async () => {
+        const {data, error} = await supabase
+        .from('messages_test')
+        .select('content, type, room_id, username')
+        .eq('room_code', roomCode)
+        .order('created_at', { ascending: true }); // Order by creation time
+
+        if (error) {
+            console.log(error);
+        }
+        if(data){
+            for(let fetchedMessage of data){
+                var chatMessage = {
+                    roomId: fetchedMessage.room_id,
+                    sender: fetchedMessage.username,
+                    content: fetchedMessage.content,
+                    type: fetchedMessage.type
+                };
+                renderMessage(chatMessage)
+            }
+            
+        }
+    }
+    fetchMessages()
+}
+
+
+function sendMessage(event) {
+    var messageContent = messageInput.value.trim();
+    if(messageContent && stompClient) {
+        var chatMessage = {
+            roomId: "public",
+            sender: username,
+            content: messageInput.value,
+            type: 'CHAT'
+        };
+        stompClient.send("/app/chat.sendMessage/" + roomcode, {}, JSON.stringify(chatMessage));
+        messageInput.value = '';
+
+       
+        const fetchMessages = async () => {
+            const {data, error} = await supabase
+            .from('messages_test')
+            .select('content, type')
+            .eq('room_code', roomcode)
+            .order('created_at', { ascending: true }); // Order by creation time
+
+            if (error) {
+                console.log(error);
+            }
+            if(data){
+                console.log(data)
+                console.log(data.length)
+                var chatMessage2 = {
+                    roomId: "public",
+                    sender: username,
+                    content: data[0].content,
+                    type: 'CHAT'
+                };
+                //stompClient.send("/app/chat.sendMessage/" + roomcode, {}, JSON.stringify(chatMessage2));
+            }
+        }
+        fetchMessages();
+    }
+    event.preventDefault();
+}
+
+
+function onMessageReceived(payload) {
+    var message = JSON.parse(payload.body);
+
+    renderMessage(message); 
+    
+    storeMessage(message.content, roomcode, message.room_id, message.type, message.sender);
 }
 
 
