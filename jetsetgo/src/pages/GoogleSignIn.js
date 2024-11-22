@@ -63,9 +63,11 @@
 import React, { useEffect, useState } from 'react';
 // Correctly import jwtDecode as a named import
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from "react-router-dom";
 
 function GoogleSignIn() {
   const [isLibraryLoaded, setIsLibraryLoaded] = useState(false);
+  const navigate = useNavigate();
 
   /* Callback function to handle the credential response */
   const handleCredentialResponse = (response) => {
@@ -75,8 +77,8 @@ function GoogleSignIn() {
     const userObject = jwtDecode(response.credential); // Use the correct function name
     console.log("Decoded User Info: ", userObject);
 
-    // Redirect to another page after successful sign-in
-    window.location.href = "/Profile"; // Example redirect
+    // Redirect to Profile after successful sign-in
+    navigate("/profile");
   };
 
   useEffect(() => {

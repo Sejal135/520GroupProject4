@@ -7,11 +7,12 @@ module.exports = {
     extend: {
       colors: {
         'navy-blue': '#000080',
-        'navy-blue-light': '#0000A0',
+        'navy-blue-light': '#0000E0',
         'sunshine-yellow': '#FFDD00',
         'sunshine-yellow-dark': '#FFB300',
+        'navy-blue-dark': '#001530',
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { Plane } from 'lucide-react';
 import GoogleSignIn from '../../pages/GoogleSignIn';
 
-function Login() {
+function SignIn() {
   return (
     <div className="min-h-screen bg-navy-blue flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
@@ -20,4 +20,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default SignIn;
