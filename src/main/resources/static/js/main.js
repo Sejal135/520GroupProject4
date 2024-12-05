@@ -159,7 +159,39 @@ function sendMessage(event) {
         stompClient.send("/app/chat.sendMessage/" + roomcode, {}, JSON.stringify(chatMessage));
         messageInput.value = '';
 
-       
+        const fetchImageUrl = async () => {
+            const {data, error} = await supabase
+            .from('places')
+            .select('url')
+            .eq('place_name', "Central Park")
+
+            if(error){
+                console.log(error);
+            }
+
+
+            if(data){
+                console.log(data[0].url)
+                var imageContainer = document.createElement('div');
+                var imageElement = document.createElement('img');
+    
+                // Set the image source to the message content (assuming it's a URL)
+                imageElement.src = data[0].url;
+                
+                // Optionally, set attributes like width, height, or alt text
+                imageElement.alt = "Message image"; // This provides alt text in case the image doesn't load
+                imageElement.style.maxWidth = '100%'; // Ensure the image fits within the container
+                imageElement.style.height = 'auto'; // Maintain aspect ratio
+                
+                // Append the image element to the message element
+                imageContainer.appendChild(imageElement);
+
+                messageArea.appendChild(imageContainer);
+
+            }
+        }
+        fetchImageUrl();
+
         const fetchMessages = async () => {
             const {data, error} = await supabase
             .from('messages_test')
@@ -179,7 +211,7 @@ function sendMessage(event) {
                     content: data[0].content,
                     type: 'CHAT'
                 };
-                //stompClient.send("/app/chat.sendMessage/" + roomcode, {}, JSON.stringify(chatMessage2));
+                
             }
         }
         fetchMessages();
