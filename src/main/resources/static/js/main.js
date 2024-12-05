@@ -36,20 +36,26 @@ function connect(event) {
 }
 
 
-function onConnected() {
+async function onConnected() {
+    //TODO: get room code header element and inject 'roomcode'
+    let room_code_id = document.getElementById('room-code-id');
+    room_code_id.textContent = `Room Code: ${roomcode}`;
+
+    //load previous chat history
+    await renderMessages(roomcode)
+
     // Subscribe to the Public Topic
     stompClient.subscribe('/topic/' + roomcode, onMessageReceived);
 
-    //load previous chat history
-    renderMessages(roomcode)
-
     // Tell your username to the server
+    let joinedMessageContent = `${username} joined!`
+    // console.log("abt to send")
     stompClient.send("/app/chat.addUser/" + roomcode,
         {},
-        JSON.stringify({roomId: "public", sender: username, type: 'JOIN'})
+        JSON.stringify({roomId: "public", sender: username, content: joinedMessageContent, type: 'JOIN'})
     )
-
-    
+    // console.log("abt to upload")
+    storeMessage(joinedMessageContent, roomcode, 'public', 'JOIN', username);
 
     connectingElement.classList.add('hidden');
 }
@@ -86,10 +92,10 @@ if (error) {
 
  function renderMessage(message){
     var messageElement = document.createElement('li');
+    // console.log(`hello render ${message}`)
 
     if(message.type === 'JOIN') {
         messageElement.classList.add('event-message');
-        message.content = message.sender + ' joined!';
     } else if (message.type === 'LEAVE') {
         messageElement.classList.add('event-message');
         message.content = message.sender + ' left!';
@@ -119,7 +125,7 @@ if (error) {
     messageArea.scrollTop = messageArea.scrollHeight;
 }
 
-function renderMessages(roomCode){
+async function renderMessages(roomCode){
     const fetchMessages = async () => {
         const {data, error} = await supabase
         .from('messages_test')
@@ -138,12 +144,13 @@ function renderMessages(roomCode){
                     content: fetchedMessage.content,
                     type: fetchedMessage.type
                 };
-                renderMessage(chatMessage)
+                // console.log("bruh")
+                renderMessage(chatMessage) 
             }
             
         }
     }
-    fetchMessages()
+    await fetchMessages()
 }
 
 
@@ -157,40 +164,41 @@ function sendMessage(event) {
             type: 'CHAT'
         };
         stompClient.send("/app/chat.sendMessage/" + roomcode, {}, JSON.stringify(chatMessage));
+        storeMessage(chatMessage.content, roomcode, chatMessage.room_id, chatMessage.type, chatMessage.sender);
         messageInput.value = '';
 
-        const fetchImageUrl = async () => {
-            const {data, error} = await supabase
-            .from('places')
-            .select('url')
-            .eq('place_name', "Central Park")
+        // const fetchImageUrl = async () => {
+        //     const {data, error} = await supabase
+        //     .from('places')
+        //     .select('url')
+        //     .eq('place_name', "Central Park")
 
-            if(error){
-                console.log(error);
-            }
+        //     if(error){
+        //         console.log(error);
+        //     }
 
 
-            if(data){
-                console.log(data[0].url)
-                var imageContainer = document.createElement('div');
-                var imageElement = document.createElement('img');
+        //     if(data){
+        //         console.log(data[0].url)
+        //         var imageContainer = document.createElement('div');
+        //         var imageElement = document.createElement('img');
     
-                // Set the image source to the message content (assuming it's a URL)
-                imageElement.src = data[0].url;
+        //         // Set the image source to the message content (assuming it's a URL)
+        //         imageElement.src = data[0].url;
                 
-                // Optionally, set attributes like width, height, or alt text
-                imageElement.alt = "Message image"; // This provides alt text in case the image doesn't load
-                imageElement.style.maxWidth = '100%'; // Ensure the image fits within the container
-                imageElement.style.height = 'auto'; // Maintain aspect ratio
+        //         // Optionally, set attributes like width, height, or alt text
+        //         imageElement.alt = "Message image"; // This provides alt text in case the image doesn't load
+        //         imageElement.style.maxWidth = '100%'; // Ensure the image fits within the container
+        //         imageElement.style.height = 'auto'; // Maintain aspect ratio
                 
-                // Append the image element to the message element
-                imageContainer.appendChild(imageElement);
+        //         // Append the image element to the message element
+        //         imageContainer.appendChild(imageElement);
 
-                messageArea.appendChild(imageContainer);
+        //         messageArea.appendChild(imageContainer);
 
-            }
-        }
-        fetchImageUrl();
+        //     }
+        // }
+        // fetchImageUrl();
 
         const fetchMessages = async () => {
             const {data, error} = await supabase
@@ -222,10 +230,7 @@ function sendMessage(event) {
 
 function onMessageReceived(payload) {
     var message = JSON.parse(payload.body);
-
-    renderMessage(message); 
-    
-    storeMessage(message.content, roomcode, message.room_id, message.type, message.sender);
+    renderMessage(message); // AMAN
 }
 
 
