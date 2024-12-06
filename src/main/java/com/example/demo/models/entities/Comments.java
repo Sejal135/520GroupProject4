@@ -31,10 +31,10 @@ public class Comments {
     private String commentContent;
 
     @ManyToOne
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "review_id", nullable = false)
     private Reviews review;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 }

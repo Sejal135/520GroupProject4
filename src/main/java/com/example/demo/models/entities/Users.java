@@ -46,6 +46,12 @@ public class Users {
     @JoinColumn(name = "travel_preferences")
     private Preferences preferences;
 
+    @Column(name = "location")
+    private String location;
+
+    @Column(name = "date_of_birth", nullable = false)
+    private Date birthDay;
+
     // Social media links will go here
 
 

@@ -1,6 +1,8 @@
 package com.example.demo.controllers;
 
+import com.example.demo.models.entities.Comments;
 import com.example.demo.models.entities.Reviews;
+import com.example.demo.services.CommentsService;
 import com.example.demo.services.ReviewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,9 @@ public class ReviewsControllerREST {
 
     @Autowired
     ReviewsService reviewsService;
+
+    @Autowired
+    CommentsService commentsService;
 
     @GetMapping("/GetAllReviewsForAPlace")
     public List<Reviews> GetAllReviewsForAPlace(@RequestParam int placeId) {
@@ -31,6 +36,11 @@ public class ReviewsControllerREST {
     @DeleteMapping("/DeleteReview")
     public String DeleteReviewFromDatabase(@RequestParam int reviewId) {
         return reviewsService.DeleteReviewFromDatabase(reviewId);
+    }
+
+    @GetMapping("/GetAllCommentsForAReview")
+    public List<Comments> GetAllCommentsForAReview(@RequestParam int reviewId) {
+        return commentsService.GetCommentsForReview(reviewId);
     }
 
 
