@@ -5,6 +5,8 @@ import Profile from "./pages/Profile";
 import FavoriteDestinations from "./pages/FavoriteDestinations";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
+import Home from "./pages/Home";
+import Itineraries from "./pages/Itineraries";
 
 const Layout = () => {
   return (
@@ -24,8 +26,10 @@ function App() {
       <Routes>
         <Route path="/" element={<SignIn />} />
         <Route element={<Layout />}>
+          <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/favorite-destinations" element={<FavoriteDestinations />} />
+          <Route path="/itineraries" element={<Itineraries />} />
         </Route>
       </Routes>
     </Router>
