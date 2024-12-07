@@ -17,18 +17,25 @@ public class GroupChatInfoService {
     private EntityManager entityManager;
 
     @Transactional
-    public List<GroupChats> findGroupChatsWithHqlQuery() {
-        String hql = "FROM GroupChats";
-        return entityManager.createQuery(hql, GroupChats.class).getResultList();
+    public List<GroupChats> findGroupChatsWithHqlQuery(int resultsPerPage, int page) {
+
+        int skip = (page - 1) * resultsPerPage;
+
+        String hql = "FROM GroupChats groupChats ORDER BY groupChats.groupId";
+        return entityManager.createQuery(hql, GroupChats.class).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
     @Transactional
-    public List<GroupChats> findGroupChatsForUser(int userId) {
+    public List<GroupChats> findGroupChatsForUser(int userId, int resultsPerPage, int page) {
+
+        int skip = (page - 1) * resultsPerPage;
+
         String hql =
                 "FROM GroupChats groupChats " +
                 "JOIN GroupMembers groupMembers ON groupChats = groupMembers.groupId " +
                 "JOIN Users users on groupMembers.userId = users " +
-                "WHERE users.userId = :userId";
-        return entityManager.createQuery(hql, GroupChats.class).setParameter("userId", userId).getResultList();
+                "WHERE users.userId = :userId " +
+                        "ORDER BY groupName ASC";
+        return entityManager.createQuery(hql, GroupChats.class).setParameter("userId", userId).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 }

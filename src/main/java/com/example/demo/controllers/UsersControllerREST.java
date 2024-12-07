@@ -59,20 +59,27 @@ public class UsersControllerREST {
         return usersService.FollowUser(followerId, userId);
     }
 
-    @PostMapping("UnfollowUser")
+    @PostMapping("/UnfollowUser")
     public String UnfollowUser(@RequestParam int followerId, @RequestParam int userId) {
         return usersService.UnfollowUser(followerId, userId);
     }
 
-    @GetMapping("GetFollowerCount")
+    @GetMapping("/GetFollowerCount")
     public Long GetFollowerCount(@RequestParam int userId) {
         return usersService.GetFollowerCount(userId);
     }
 
-    @GetMapping("GetUsersExplorerHomePageResults")
-    public List<Reviews> GetPaginatedFeed(@RequestParam int userId, @RequestParam int page, @RequestParam int numPostsPerPage, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")Date datePosted) {
-        return explorerHomepageService.GetPaginatedFeed(datePosted, page, numPostsPerPage, userId);
+    @GetMapping("/GetUsersExplorerHomePageResults")
+    public List<Reviews> GetPaginatedFeed(@RequestParam int userId, @RequestParam int page, @RequestParam int resultsPerPage, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")Date datePosted) {
+        return explorerHomepageService.GetPaginatedFeed(datePosted, page, resultsPerPage, userId);
     }
+
+    // create an algorithm to get related posts for person's travel interests
+
+    // Get most popular destinations visited by users
+
+    // Favorite destinations types: All, Experiences, Dining, Sightseeing, Misc
+
 
 
 }

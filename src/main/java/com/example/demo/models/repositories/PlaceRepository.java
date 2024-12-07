@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface PlaceRepository extends CrudRepository<Places, Integer> {
 
-    public Places findByPlaceId(Integer placeId);
 
+    Places findByPlaceId(Integer favoritePlaceId);
 }

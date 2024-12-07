@@ -1,8 +1,10 @@
 package com.example.demo.services;
 
+import com.example.demo.models.entities.Comments;
 import com.example.demo.models.entities.PlusOnes;
 import com.example.demo.models.entities.Reviews;
 import com.example.demo.models.entities.Users;
+import com.example.demo.models.repositories.CommentsRepository;
 import com.example.demo.models.repositories.PlusOneRepository;
 import com.example.demo.models.repositories.ReviewsRepository;
 import com.example.demo.models.repositories.UsersRepository;
@@ -24,6 +26,9 @@ public class PlusOneService {
     private ReviewsRepository reviewsRepository;
 
     @Autowired
+    private CommentsRepository commentsRepository;
+
+    @Autowired
     private UsersRepository usersRepository;
 
     @Autowired
@@ -40,7 +45,7 @@ public class PlusOneService {
             return "Review or user not found";
         }
 
-        PlusOnes plusOneAlreadyExists = plusOneRepository.findByUserId(curUser);
+        PlusOnes plusOneAlreadyExists = plusOneRepository.findByUserIdAndReviewId(curUser, curReview);
 
         if (plusOneAlreadyExists != null) {
             return "PlusOne already exists in database for user";
@@ -72,7 +77,7 @@ public class PlusOneService {
             return "Review or user not found";
         }
 
-        PlusOnes plusOneAlreadyExists = plusOneRepository.findByUserId(curUser);
+        PlusOnes plusOneAlreadyExists = plusOneRepository.findByUserIdAndReviewId(curUser, curReview);
 
         if (plusOneAlreadyExists == null) {
             return "User has not +1ed this review";
@@ -86,4 +91,62 @@ public class PlusOneService {
 
         return "Successfully decremented the +1";
     }
+
+    @Transactional
+    public String IncrementCommentPlusOne(int commentId, int userId) {
+        Comments curComment = commentsRepository.findByCommentId(commentId);
+
+        Users curUser = usersRepository.findByUserId(userId);
+
+        if (curComment == null || curUser == null) {
+            return "Comment or user not found";
+        }
+
+        PlusOnes plusOneAlreadyExists = plusOneRepository.findByUserIdAndCommentId(curUser, curComment);
+
+        if (plusOneAlreadyExists != null) {
+            return "PlusOne already exists in database for user";
+        }
+
+        PlusOnes plusOneToCreate = new PlusOnes();
+
+        plusOneToCreate.setUserId(curUser);
+
+        plusOneToCreate.setCommentId(curComment);
+
+        plusOneRepository.save(plusOneToCreate);
+
+        curComment.setPlusOneCount(curComment.getPlusOneCount() + 1);
+
+        commentsRepository.save(curComment);
+
+        return "Successfully incremented the +1";
+    }
+
+    @Transactional
+    public String DecrementPlusOneForComment(int commentId, int userId) {
+
+        Comments curComment = commentsRepository.findByCommentId(commentId);
+
+        Users curUser = usersRepository.findByUserId(userId);
+
+        if (curComment == null || curUser == null) {
+            return "Review or user not found";
+        }
+
+        PlusOnes plusOneAlreadyExists = plusOneRepository.findByUserIdAndCommentId(curUser, curComment);
+
+        if (plusOneAlreadyExists == null) {
+            return "User has not +1ed this review";
+        }
+
+        plusOneRepository.deleteById(plusOneAlreadyExists.getPlusOneId());
+
+        curComment.setPlusOneCount(curComment.getPlusOneCount() - 1);
+
+        commentsRepository.save(curComment);
+
+        return "Successfully decremented the +1";
+    }
+
 }

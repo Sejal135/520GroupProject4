@@ -7,14 +7,11 @@ import com.example.demo.models.repositories.PlaceRepository;
 import com.example.demo.models.repositories.ReviewsRepository;
 import com.example.demo.models.repositories.UsersRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -34,21 +31,29 @@ public class ReviewsService {
     private PlaceRepository placeRepository;
 
     @Transactional
-    public List<Reviews> FindAllReviewsForPlace(int placeId) {
+    public List<Reviews> FindAllReviewsForPlace(int placeId, int resultsPerPage, int page) {
+
+        int skip = (page - 1) * resultsPerPage;
+
         String hql =
                 "FROM Reviews reviews " +
                         "JOIN Places places ON places = reviews.placeId " +
-                        "WHERE places.placeId = :placeId";
-        return entityManager.createQuery(hql, Reviews.class).setParameter("placeId", placeId).getResultList();
+                        "WHERE places.placeId = :placeId " +
+                        "ORDER BY reviews.plusOneCount DESC";
+        return entityManager.createQuery(hql, Reviews.class).setParameter("placeId", placeId).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
     @Transactional
-    public List<Reviews> FindAllReviewsForUser(int userId) {
+    public List<Reviews> FindAllReviewsForUser(int userId, int resultsPerPage, int page) {
+
+        int skip = (page - 1) * resultsPerPage;
+
         String hql =
                 "From Reviews reviews " +
                         "JOIN Users users on users = reviews.reviewerId " +
-                        "where users.userId = :userId";
-        return entityManager.createQuery(hql, Reviews.class).setParameter("userId", userId).getResultList();
+                        "where users.userId = :userId " +
+                        "ORDER BY reviews.plusOneCount";
+        return entityManager.createQuery(hql, Reviews.class).setParameter("userId", userId).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
     @Transactional
@@ -86,7 +91,7 @@ public class ReviewsService {
     @Transactional
     public String DeleteReviewFromDatabase(int reviewId) {
         reviewsRepository.deleteById(reviewId);
-        return "Successfullly removed review from repository.";
+        return "Successfully removed review from repository.";
     }
 
 }

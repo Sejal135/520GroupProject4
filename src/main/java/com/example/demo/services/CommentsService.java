@@ -32,13 +32,17 @@ public class CommentsService {
     private UsersRepository usersRepository;
 
     @Transactional
-    public List<Comments> GetCommentsForReview(int reviewId) {
+    public List<Comments> GetCommentsForReview(int reviewId, int resultsPerPage, int page) {
+
+        int skip = (page - 1) * resultsPerPage;
+
         String hql =
                 "FROM Comments comments " +
                         "JOIN Reviews reviews ON reviews = comments.review " +
                         "JOIN Users users on comments.user = users " +
-                        "WHERE reviews.reviewId = :reviewId";
-        return entityManager.createQuery(hql, Comments.class).setParameter("reviewId", reviewId).getResultList();
+                        "WHERE reviews.reviewId = :reviewId " +
+                        "ORDER BY comments.commentTimestamp DESC";
+        return entityManager.createQuery(hql, Comments.class).setParameter("reviewId", reviewId).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
     @Transactional

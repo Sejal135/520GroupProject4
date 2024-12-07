@@ -23,4 +23,14 @@ public class PlusOneControllerREST {
     public String DecrementPlusOne(@RequestParam int reviewId, @RequestParam int userId) {
         return plusOneService.DecrementPlusOne(reviewId, userId);
     }
+
+    @GetMapping("/IncrementCommentPlusOne")
+    public String IncrementCommentPlusOne(@RequestParam int commentId, @RequestParam int userId) {
+        return plusOneService.IncrementCommentPlusOne(commentId, userId);
+    }
+
+    @GetMapping("/DecrementCommentPlusOne")
+    public String DecrementCommentPlusOne(@RequestParam int commentId, @RequestParam int userId) {
+        return plusOneService.DecrementPlusOneForComment(commentId, userId);
+    }
 }

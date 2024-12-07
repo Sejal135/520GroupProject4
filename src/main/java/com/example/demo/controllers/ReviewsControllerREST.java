@@ -19,13 +19,13 @@ public class ReviewsControllerREST {
     CommentsService commentsService;
 
     @GetMapping("/GetAllReviewsForAPlace")
-    public List<Reviews> GetAllReviewsForAPlace(@RequestParam int placeId) {
-        return reviewsService.FindAllReviewsForPlace(placeId);
+    public List<Reviews> GetAllReviewsForAPlace(@RequestParam int placeId, @RequestParam int resultsPerPage, int page) {
+        return reviewsService.FindAllReviewsForPlace(placeId, resultsPerPage, page);
     }
 
     @GetMapping("/GetAllReviewsForAUser")
-    public List<Reviews> GetAllReviewsForAUser(@RequestParam int userId) {
-        return reviewsService.FindAllReviewsForUser(userId);
+    public List<Reviews> GetAllReviewsForAUser(@RequestParam int userId, @RequestParam int resultsPerPage, @RequestParam int page) {
+        return reviewsService.FindAllReviewsForUser(userId, resultsPerPage, page);
     }
 
     @PostMapping("/AddReviewToDatabase")
@@ -39,8 +39,8 @@ public class ReviewsControllerREST {
     }
 
     @GetMapping("/GetAllCommentsForAReview")
-    public List<Comments> GetAllCommentsForAReview(@RequestParam int reviewId) {
-        return commentsService.GetCommentsForReview(reviewId);
+    public List<Comments> GetAllCommentsForAReview(@RequestParam int reviewId, @RequestParam int page, @RequestParam int resultsPerPage) {
+        return commentsService.GetCommentsForReview(reviewId, resultsPerPage, page);
     }
 
 

@@ -32,6 +32,7 @@ import org.springframework.context.annotation.ComponentScan;
 @Configuration
 @ComponentScan
 
+
 public class SpringConfig {
 
     @Bean
@@ -45,7 +46,7 @@ public class SpringConfig {
                 })
                 .oauth2Login(oauth2login -> {
                     oauth2login
-                            .loginPage("/login")
+                            .loginPage("/")
                             .defaultSuccessUrl("/profile", true);
                 })
                 .build();

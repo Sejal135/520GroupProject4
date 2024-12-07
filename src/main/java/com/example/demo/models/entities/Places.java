@@ -1,9 +1,12 @@
 package com.example.demo.models.entities;
 
+import com.example.demo.models.DestinationType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+
 
 @Getter
 @Setter
@@ -19,4 +22,7 @@ public class Places {
 
     @Column(name = "place_name", nullable = false)
     private String placeName;
+
+    @Enumerated(EnumType.STRING)
+    private DestinationType placeType;
 }

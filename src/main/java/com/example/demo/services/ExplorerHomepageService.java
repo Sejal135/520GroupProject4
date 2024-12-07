@@ -26,7 +26,7 @@ public class ExplorerHomepageService {
     @Autowired
     private UsersService usersService;
 
-    public List<Reviews> GetPaginatedFeed(Date datePosted, int page, int numPostsPerPage, int userId) {
+    public List<Reviews> GetPaginatedFeed(Date datePosted, int page, int resultsPerPage, int userId) {
 
         Users user = usersRepository.findByUserId(userId);
 
@@ -42,7 +42,7 @@ public class ExplorerHomepageService {
             followersListInteger.add(follower.getPosterId().getUserId());
         }
 
-        int skip = numPostsPerPage * (page - 1);
+        int skip = resultsPerPage * (page - 1);
 
         String hql =
                 "FROM Reviews reviews " +
@@ -51,7 +51,7 @@ public class ExplorerHomepageService {
                         "AND reviews.timeReviewLeft <= :datePosted " +
                         "ORDER BY reviews.timeReviewLeft DESC";
         return entityManager.createQuery(hql, Reviews.class).setParameter("userId", followersListInteger)
-                .setParameter("datePosted", datePosted).setFirstResult(skip).setMaxResults(numPostsPerPage)
+                .setParameter("datePosted", datePosted).setFirstResult(skip).setMaxResults(resultsPerPage)
                 .getResultList();
 
     }
