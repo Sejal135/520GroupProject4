@@ -18,7 +18,7 @@ public class PlacesService {
     public List<Places> GetPlacesByPlacenameSubstring(String placename, int resultsLimit, int page) {
         String hql =
                 "FROM Places places " +
-                        "WHERE LOWER(places.placeName) LIKE :placename ORDER BY places.placeName ASC";
+                        "WHERE LOWER(places.placeName) LIKE LOWER(:placename) ORDER BY places.placeName ASC";
 
         int skip = (page - 1) * resultsLimit;
 
