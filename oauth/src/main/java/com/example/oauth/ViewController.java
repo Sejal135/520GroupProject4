@@ -22,7 +22,7 @@ public class ViewController {
     
         model.addAttribute("name", name != null ? name : "Name not available");
         model.addAttribute("email", email != null ? email : "Email not available");
-        model.addAttribute("photo", photo != null ? photo : "/path/to/default-photo.jpg");
+        // model.addAttribute("photo", photo != null ? photo : "/path/to/default-photo.jpg");
     
         return "user_profile";
     }
