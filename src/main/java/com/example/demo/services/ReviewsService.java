@@ -1,17 +1,14 @@
 package com.example.demo.services;
 
-import com.example.demo.models.entities.Places;
-import com.example.demo.models.entities.Reviews;
-import com.example.demo.models.entities.Users;
-import com.example.demo.models.repositories.PlaceRepository;
-import com.example.demo.models.repositories.ReviewsRepository;
-import com.example.demo.models.repositories.UsersRepository;
+import com.example.demo.models.entities.*;
+import com.example.demo.models.repositories.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.stream.events.Comment;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +26,14 @@ public class ReviewsService {
 
     @Autowired
     private PlaceRepository placeRepository;
+
+    @Autowired
+    private CommentsRepository commentsRepository;
+
+    @Autowired CommentsService commentsService;
+
+    @Autowired
+    PlusOneRepository plusOneRepository;
 
     @Transactional
     public List<Reviews> FindAllReviewsForPlace(int placeId, int resultsPerPage, int page, Date reviewPostedTimestamp) {
@@ -92,6 +97,15 @@ public class ReviewsService {
 
     @Transactional
     public String DeleteReviewFromDatabase(int reviewId) {
+        Reviews review = reviewsRepository.findByReviewId(reviewId);
+        List<Comments> commentsList = commentsRepository.findAllByReview(review);
+
+        List<PlusOnes> reviewPlusOnes = plusOneRepository.findAllByReviewId(review);
+
+        commentsService.DeleteMultipleCommentsFromDatabase(commentsList);
+
+        plusOneRepository.deleteAll(reviewPlusOnes);
+
         reviewsRepository.deleteById(reviewId);
         return "Successfully removed review from repository.";
     }

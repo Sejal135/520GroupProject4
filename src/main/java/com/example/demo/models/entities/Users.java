@@ -35,7 +35,7 @@ public class Users {
     @Column(name = "profile_pic", length = 65535, columnDefinition = "Text")
     private String profilePic;
 
-    @Column(name = "email", length = 1000)
+    @Column(name = "email", length = 1000, nullable = false, unique = true)
     private String email;
 
     @OneToOne

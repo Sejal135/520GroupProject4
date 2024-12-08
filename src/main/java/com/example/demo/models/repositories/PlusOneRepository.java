@@ -6,11 +6,15 @@ import com.example.demo.models.entities.Reviews;
 import com.example.demo.models.entities.Users;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface PlusOneRepository extends CrudRepository<PlusOnes, Integer> {
 
-    public PlusOnes findByReviewId(Reviews reviewId);
+    public List<PlusOnes> findAllByReviewId(Reviews reviewId);
 
-    public PlusOnes findByUserId(Users userId);
+    public List<PlusOnes> findAllByCommentId(Comments commentId);
+
+    public List<PlusOnes> findAllByCommentIdIn(List<Comments> commentIds);
 
     PlusOnes findByUserIdAndReviewId(Users curUser, Reviews reviews);
     PlusOnes findByUserIdAndCommentId(Users curUser, Comments commentId);

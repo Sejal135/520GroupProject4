@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.models.entities.*;
+import com.example.demo.services.CommentsService;
 import com.example.demo.services.ExplorerHomepageService;
 import com.example.demo.services.GroupChatInfoService;
 import com.example.demo.services.UsersService;
@@ -20,6 +21,9 @@ public class UsersControllerREST {
 
     @Autowired
     UsersService usersService;
+
+    @Autowired
+    CommentsService commentsService;
 
     @Autowired
     ExplorerHomepageService explorerHomepageService;
@@ -102,5 +106,15 @@ public class UsersControllerREST {
     @DeleteMapping("/DeleteItineraryItem")
     public String DeleteItineraryItem(@RequestParam int itineraryItemId) {
         return usersService.DeleteItineraryItem(itineraryItemId);
+    }
+
+    @PostMapping("/AddCommentToDatabase")
+    public String AddCommentToDatabase(@RequestParam int userId, @RequestParam int reviewId, @RequestParam String commentContents) {
+        return commentsService.AddCommentToDatabase(userId, reviewId, commentContents);
+    }
+
+    @DeleteMapping("/RemoveCommentFromDatabase")
+    public String RemoveCommentFromDatabase(@RequestParam int commentId) {
+        return commentsService.DeleteCommentFromDatabase(commentId);
     }
 }

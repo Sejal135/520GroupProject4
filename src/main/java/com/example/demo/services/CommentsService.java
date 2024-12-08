@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.models.entities.*;
 import com.example.demo.models.repositories.CommentsRepository;
+import com.example.demo.models.repositories.PlusOneRepository;
 import com.example.demo.models.repositories.ReviewsRepository;
 import com.example.demo.models.repositories.UsersRepository;
 import jakarta.persistence.EntityManager;
@@ -31,6 +32,9 @@ public class CommentsService {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private PlusOneRepository plusOneRepository;
+
     @Transactional
     public List<Comments> GetCommentsForReview(int reviewId, int resultsPerPage, int page, Date datePosted) {
 
@@ -48,7 +52,7 @@ public class CommentsService {
     }
 
     @Transactional
-    public String AddCommentToDatabase(String title, int userId, int reviewId, String commentContents) {
+    public String AddCommentToDatabase(int userId, int reviewId, String commentContents) {
 
         Comments comment = new Comments();
 
@@ -73,7 +77,25 @@ public class CommentsService {
 
     @Transactional
     public String DeleteCommentFromDatabase(int commentId) {
+
+        Comments comment = commentsRepository.findByCommentId(commentId);
+
+        List<PlusOnes> plusOnesList = plusOneRepository.findAllByCommentId(comment);
+
+        plusOneRepository.deleteAll(plusOnesList);
+
         commentsRepository.deleteById(commentId);
+        return "Successfully removed review from repository.";
+    }
+
+    @Transactional
+    public String DeleteMultipleCommentsFromDatabase(List<Comments> commentIds) {
+
+        List<PlusOnes> plusOnesList = plusOneRepository.findAllByCommentIdIn(commentIds);
+
+        plusOneRepository.deleteAll(plusOnesList);
+
+        commentsRepository.deleteAll(commentIds);
         return "Successfully removed review from repository.";
     }
 }
