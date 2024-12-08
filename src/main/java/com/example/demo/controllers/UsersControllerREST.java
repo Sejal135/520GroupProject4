@@ -26,6 +26,9 @@ public class UsersControllerREST {
     CommentsService commentsService;
 
     @Autowired
+    GroupChatInfoService groupChatInfoService;
+
+    @Autowired
     ExplorerHomepageService explorerHomepageService;
 
     @GetMapping("/GetPreferencesForUser")
@@ -56,6 +59,11 @@ public class UsersControllerREST {
     @GetMapping("/GetUserProfileInfo")
     public Users GetUserProfile(@RequestParam int userId) {
         return usersService.GetUserProfile(userId);
+    }
+
+    @GetMapping("/GetUserProfileByEmail")
+    public Users GetUserProfileByEmail(@RequestParam String email) {
+        return usersService.GetUserProfileByEmail(email);
     }
 
     @PostMapping("/FollowUser")
@@ -116,5 +124,10 @@ public class UsersControllerREST {
     @DeleteMapping("/RemoveCommentFromDatabase")
     public String RemoveCommentFromDatabase(@RequestParam int commentId) {
         return commentsService.DeleteCommentFromDatabase(commentId);
+    }
+
+    @PostMapping("/AddUserToGroupChat")
+    public String AddUserToGroupChat(@RequestParam int groupId, @RequestParam int userId){
+        return groupChatInfoService.AddUserToGroupChat(userId, groupId);
     }
 }

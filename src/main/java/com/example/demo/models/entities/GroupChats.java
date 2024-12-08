@@ -30,4 +30,7 @@ public class GroupChats {
     @Column(name = "group_name", nullable = false)
     private String groupName;
 
+    @Column(name = "join_code", nullable = false)
+    private String joinCode;
+
 }

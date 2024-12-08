@@ -120,6 +120,16 @@ public class UsersService {
     }
 
     @Transactional
+    public Users GetUserProfileByEmail(String email) {
+        String hql =
+                "FROM Users users " +
+                        "WHERE LOWER(users.email) = LOWER(:email)";
+        Users user = entityManager.createQuery(hql, Users.class).setParameter("email", email.trim()).getSingleResult();
+
+        return user;
+    }
+
+    @Transactional
     public String FollowUser(int followerId, int posterId) {
         if (followerId == posterId) {
             return "You cannot follow yourself.";
