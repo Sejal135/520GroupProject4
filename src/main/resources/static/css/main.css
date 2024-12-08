@@ -230,6 +230,29 @@ button.accent {
     font-weight: 500;
 }
 
+.close-chat {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    font-size: 18px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: background-color 0.3s ease;
+}
+
+.close-chat:hover {
+    background-color: darkred;
+}
+
 .connecting {
     padding-top: 5px;
     text-align: center;

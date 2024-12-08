@@ -90,7 +90,40 @@ if (error) {
   store();
 }
 
- function renderMessage(message){
+function disconnectChat() {
+    if (stompClient) {
+        // Notify the server that the user has left
+        let leaveMessageContent = `${username} left!`;
+        stompClient.send(
+            `/app/chat.addUser/${roomcode}`,
+            {},
+            JSON.stringify({ roomId: "public", sender: username, content: leaveMessageContent, type: 'LEAVE' })
+        );
+        storeMessage(leaveMessageContent, roomcode, 'public', 'LEAVE', username);
+
+        // Unsubscribe from the topic
+        stompClient.unsubscribe(`/topic/${roomcode}`);
+
+        // Disconnect the WebSocket client
+        stompClient.disconnect(() => {
+            console.log("Disconnected from WebSocket server");
+        });
+    }
+
+    // Reset UI
+    chatPage.classList.add('hidden');
+    usernamePage.classList.remove('hidden');
+    messageArea.innerHTML = ''; // Clear chat messages
+    connectingElement.classList.remove('hidden'); // Show connecting message when reconnecting
+    username = null;
+    roomcode = null;
+
+    alert("You have disconnected from the chat.");
+}
+
+
+
+function renderMessage(message){
     var messageElement = document.createElement('li');
     // console.log(`hello render ${message}`)
 
@@ -189,3 +222,4 @@ function getAvatarColor(messageSender) {
 
 usernameForm.addEventListener('submit', connect, true)
 messageForm.addEventListener('submit', sendMessage, true)
+document.querySelector('.close-chat').addEventListener('click', disconnectChat);
