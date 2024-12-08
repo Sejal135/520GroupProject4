@@ -1,8 +1,10 @@
 package com.example.demo.services;
 
 import com.example.demo.models.entities.Followers;
+import com.example.demo.models.entities.Preferences;
 import com.example.demo.models.entities.Reviews;
 import com.example.demo.models.entities.Users;
+import com.example.demo.models.repositories.PreferencesRepository;
 import com.example.demo.models.repositories.UsersRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -22,6 +24,9 @@ public class ExplorerHomepageService {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private PreferencesRepository preferencesRepository;
 
     @Autowired
     private UsersService usersService;
@@ -55,4 +60,27 @@ public class ExplorerHomepageService {
                 .getResultList();
 
     }
+
+    public List<Reviews> GetPaginatedExplorerFeed(Date datePosted, int page, int resultsPerPage, int userId) {
+
+        Users user = usersRepository.findByUserId(userId);
+
+        List<Preferences> userPreferences = preferencesRepository.findAllByUserId(user);
+
+        int skip = (page - 1) * resultsPerPage;
+
+        String hql =
+                "SELECT Distinct reviews " +
+                        "FROM Reviews reviews " +
+                        "JOIN Users users on users = reviews.reviewerId " +
+                        "JOIN Preferences preferences on users = preferences.userId " +
+                        "WHERE preferences in :userPreferences " +
+                        "AND reviews.timeReviewLeft < :datePosted " +
+                        "ORDER BY reviews.timeReviewLeft DESC";
+        return entityManager.createQuery(hql, Reviews.class).setParameter("userPreferences", userPreferences).setParameter("datePosted", datePosted).setFirstResult(skip).setMaxResults(resultsPerPage)
+                .getResultList();
+
+    }
+
+
 }

@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface PreferencesRepository extends CrudRepository<Preferences, Integer> {
 
-    public List<Preferences> findByUserId(Users user);
+    public List<Preferences> findAllByUserId(Users user);
 }

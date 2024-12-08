@@ -7,11 +7,13 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class ChatController {
 
+    @CrossOrigin
     @MessageMapping("/chat.sendMessage/{roomId}")
     @SendTo("/topic/{roomId}")
     public ChatMessage sendMessage(
@@ -20,6 +22,7 @@ public class ChatController {
         return chatMessage;
     }
 
+    @CrossOrigin
     @MessageMapping("/chat.addUser/{roomId}")
     @SendTo("/topic/{roomId}")
     public ChatMessage addUser(

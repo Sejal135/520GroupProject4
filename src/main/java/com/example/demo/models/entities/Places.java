@@ -23,6 +23,7 @@ public class Places {
     @Column(name = "place_name", nullable = false)
     private String placeName;
 
+    @Column(name = "place_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private DestinationType placeType;
 }

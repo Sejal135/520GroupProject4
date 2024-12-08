@@ -1,5 +1,6 @@
 package com.example.demo.models.entities;
 
+import com.example.demo.models.TravelerTypes;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +22,7 @@ public class Preferences {
     @JoinColumn(name = "user_id", nullable = false)
     private Users userId;
 
-    @Column(name = "preference_type", nullable = false)
-    String preferenceType;
-
-    @Column(name = "preference", nullable = false)
-    String preference;
+    @Column(name = "preferences", nullable = false)
+    @Enumerated(EnumType.STRING)
+    TravelerTypes preference;
 }

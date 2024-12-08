@@ -13,12 +13,14 @@ public class ChatControllerREST {
     @Autowired
     GroupChatInfoService groupChatInfoService;
 
+    @CrossOrigin
     @GetMapping("/GetAllGroupChatsInfo")
     public List<GroupChats> listAllGroupChatMessages(@RequestParam int resultsPerPage, @RequestParam int page) {
         List<GroupChats> groupChatsList = groupChatInfoService.findGroupChatsWithHqlQuery(resultsPerPage, page);
         return groupChatsList;
     }
 
+    @CrossOrigin
     @GetMapping("/GetAllGroupsForUser")
     public List<GroupChats> GetAllGroupsForUser(@RequestParam int userId, @RequestParam int resultsPerPage, @RequestParam int page) {
         return groupChatInfoService.findGroupChatsForUser(userId, resultsPerPage, page);

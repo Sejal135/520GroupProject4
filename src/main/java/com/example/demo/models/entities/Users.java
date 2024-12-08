@@ -42,10 +42,6 @@ public class Users {
     @JoinColumn(name = "social_media_links_id")
     private SocialMediaLinks socialMediaLinks;
 
-    @OneToOne
-    @JoinColumn(name = "travel_preferences")
-    private Preferences preferences;
-
     @Column(name = "location")
     private String location;
 
