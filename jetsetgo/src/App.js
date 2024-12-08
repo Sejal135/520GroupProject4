@@ -10,6 +10,7 @@ import Itineraries from "./pages/Itineraries";
 import CreateProfile from "./pages/CreateProfile";
 import GroupChatsPage from "./pages/ViewChats";
 import GroupChat from "./pages/GroupChat";
+import Location from "./pages/Location";
 
 const Layout = () => {
   const location = useLocation();
@@ -42,6 +43,7 @@ function App() {
           <Route path="/create-profile" element={<CreateProfile />} />
           <Route path="/group-chats" element={<GroupChatsPage />} />
           <Route path="/chat" element={<GroupChat />} />
+          <Route path="/location" element={<Location />} />
         </Route>
       </Routes>
     </Router>
