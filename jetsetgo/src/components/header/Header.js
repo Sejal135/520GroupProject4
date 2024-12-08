@@ -31,7 +31,7 @@ export function Header() {
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-navy-blue-light rounded-md shadow-lg py-1">
               <a href="/profile" className="block px-4 py-2 text-sm hover:bg-amber-700">Profile</a>
-              <a href="/view-chats" className="block px-4 py-2 text-sm hover:bg-amber-700">View Chats</a>
+              <a href="/group-chats" className="block px-4 py-2 text-sm hover:bg-amber-700">View Chats</a>
               <a href="/" className="block px-4 py-2 text-sm hover:bg-amber-700">Logout</a>
             </div>
           )}

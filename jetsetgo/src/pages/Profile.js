@@ -6,6 +6,23 @@ import { Card, CardHeader } from "../components/ui/card"
 import { Badge } from "../components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 
+//FETCH functionality with backend
+// async function getUser() {
+//   const url = "https://example.org/products.json";
+//   try {
+//     const response = await fetch(url);
+//     if (!response.ok) {
+//       throw new Error(`Response status: ${response.status}`);
+//     }
+
+//     const json = await response.json();
+//     console.log(json);
+//   } catch (error) {
+//     console.error(error.message);
+//   }
+// }
+
+
 export default function Profile() {
   return (
     <div className="min-h-screen bg-navy-blue text-white">

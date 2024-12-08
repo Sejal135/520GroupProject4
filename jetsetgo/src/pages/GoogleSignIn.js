@@ -77,8 +77,9 @@ function GoogleSignIn() {
     const userObject = jwtDecode(response.credential); // Use the correct function name
     console.log("Decoded User Info: ", userObject);
 
-    // Redirect to Home after successful sign-in
-    navigate("/home");
+    // Redirect to Create Profile after successful sign-in
+    // add logic here to check if user already has a profile
+    navigate("/create-profile");
   };
 
   useEffect(() => {
