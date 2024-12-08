@@ -1,0 +1,182 @@
+/* html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+} */
+
+/* * {
+  box-sizing: border-box;
+}
+
+.view-gc-container {
+    background-color: #243b55;
+    color: #ffffff;
+    font-family: "Playfair Display", serif;
+    font-weight: 600;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+  }
+  
+  h1 {
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  .back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: transparent;
+    color: #ffffff;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .join-button {
+    display: block;
+    margin: 20px auto;
+    background-color: #1d707f;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: "Playfair Display", serif;
+    font-weight: 600;
+  }
+  
+  .group-list {
+    margin-top: 30px;
+  }
+  
+  .group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1b2735;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .group-item:hover {
+    background-color: #2a3947;
+  }
+  
+  .group-info h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+  
+  .group-info p {
+    margin: 5px 0 0;
+    color: #e7a84e;
+  }
+  
+  .group-date {
+    background-color: black;
+    color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+   */
+
+   /* Apply border-box for all elements to manage padding and margin */
+* {
+  box-sizing: border-box;
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
+body, html {
+  height: 100%; /* Ensure body and html take up full height */
+  width: 100%; /* Ensure body and html take up full width */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.view-gc-container {
+  background-color: #243b55;
+  color: #ffffff;
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  min-height: 100vh; /* Ensures the container takes up full screen height */
+  padding: 20px;
+  position: relative;
+  width: 100%; /* Ensure container takes full width */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  margin: 0 auto; /* Center the content */
+}
+
+h1 {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: transparent;
+  color: #ffffff;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.join-button {
+  display: block;
+  margin: 20px auto;
+  background-color: #1d707f;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+}
+
+.group-list {
+  margin-top: 30px;
+}
+
+.group-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1b2735;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+  width: 100%; /* Ensure the group items stretch across the available width */
+}
+
+.group-item:hover {
+  background-color: #2a3947;
+}
+
+.group-info h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.group-info p {
+  margin: 5px 0 0;
+  color: #e7a84e;
+}
+
+.group-date {
+  background-color: black;
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}

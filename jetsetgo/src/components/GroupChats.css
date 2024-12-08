@@ -1,0 +1,64 @@
+/* General Styles*/
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Playfair Display', serif;
+    background-color: #243B55;
+    color: white;
+  }
+  
+  /* Container for the group chats */
+  .group-chats-container {
+    max-width: 100%; /* Make it span the full width */
+    padding: 20px 40px; /* Add padding for readability */
+    box-sizing: border-box; /* Ensure padding doesn't affect total width */
+  }
+  
+  /* Header */
+  .header {
+    text-align: center;
+    font-size: 2em;
+    font-weight: 600;
+    margin-bottom: 40px; /* Add space below the header */
+  }
+  
+  /* List of chats */
+  .chat-list {
+    overflow-y: auto;
+    max-height: 80vh;
+    padding-right: 10px;
+  }
+  
+  /* Individual chat card */
+  .chat-card {
+    border-top: 2px solid #CC8E35; /* Yellow line between chats */
+    padding: 20px 0;
+  }
+  
+  /* Chat Name */
+  .chat-name {
+    font-size: 1.5em;
+    font-weight: 600;
+  }
+  
+  /* Chat Description */
+  .chat-description {
+    font-size: 1em;
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+  
+  /* Chat Footer */
+  .chat-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1em;
+    margin-top: 10px;
+    color: #CC8E35; /* Yellow color for both location and room code */
+  }
+
+.chat-location,
+.chat-room-code {
+  color: #CC8E35; /* Ensures yellow color for these elements */
+}
