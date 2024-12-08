@@ -74,12 +74,33 @@ public class UsersControllerREST {
         return explorerHomepageService.GetPaginatedFeed(datePosted, page, resultsPerPage, userId);
     }
 
-    // create an algorithm to get related posts for person's travel interests
+    @GetMapping("/GetItineraryInfoByItineraryId")
+    public List<ItineraryItem> GetItineraryById(@RequestParam int itineraryId) {
+        return usersService.GetAllItemsForAnItinerary(itineraryId);
+    }
 
-    // Get most popular destinations visited by users
+    @GetMapping("/GetItinerariesForUser")
+    public List<List<ItineraryItem>> GetUserItinerariesById(@RequestParam int userId) {
+        return usersService.GetAllItemsAUsersItineraries(userId);
+    }
 
-    // Favorite destinations types: All, Experiences, Dining, Sightseeing, Misc
+    @PostMapping("/CreateItinerary")
+    public String CreateItinerary(@RequestParam int userId, @RequestParam String itineraryName, @RequestBody List<ItineraryItem> itineraryItems) {
+        return usersService.AddItineraryToDatabase(userId, itineraryName, itineraryItems);
+    }
 
+    @DeleteMapping("/DeleteItinerary")
+    public String DeleteItinerary(@RequestParam int referenceId) {
+        return usersService.DeleteItineraryFromDatabase(referenceId);
+    }
 
+    @PostMapping("/AddItineraryItem")
+    public String AddItineraryItem(@RequestParam int referenceId, @RequestBody ItineraryItem itemToAdd) {
+        return usersService.AddItineraryItem(referenceId, itemToAdd);
+    }
 
+    @DeleteMapping("/DeleteItineraryItem")
+    public String DeleteItineraryItem(@RequestParam int itineraryItemId) {
+        return usersService.DeleteItineraryItem(itineraryItemId);
+    }
 }

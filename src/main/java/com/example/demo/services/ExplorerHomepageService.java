@@ -48,7 +48,7 @@ public class ExplorerHomepageService {
                 "FROM Reviews reviews " +
                         "JOIN Users users on users = reviews.reviewerId " +
                         "WHERE users.userId IN :userId " +
-                        "AND reviews.timeReviewLeft <= :datePosted " +
+                        "AND reviews.timeReviewLeft < :datePosted " +
                         "ORDER BY reviews.timeReviewLeft DESC";
         return entityManager.createQuery(hql, Reviews.class).setParameter("userId", followersListInteger)
                 .setParameter("datePosted", datePosted).setFirstResult(skip).setMaxResults(resultsPerPage)

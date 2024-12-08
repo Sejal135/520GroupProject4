@@ -5,8 +5,10 @@ import com.example.demo.models.entities.Reviews;
 import com.example.demo.services.CommentsService;
 import com.example.demo.services.ReviewsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -19,13 +21,13 @@ public class ReviewsControllerREST {
     CommentsService commentsService;
 
     @GetMapping("/GetAllReviewsForAPlace")
-    public List<Reviews> GetAllReviewsForAPlace(@RequestParam int placeId, @RequestParam int resultsPerPage, int page) {
-        return reviewsService.FindAllReviewsForPlace(placeId, resultsPerPage, page);
+    public List<Reviews> GetAllReviewsForAPlace(@RequestParam int placeId, @RequestParam int resultsPerPage, @RequestParam int page, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")Date datePosted) {
+        return reviewsService.FindAllReviewsForPlace(placeId, resultsPerPage, page, datePosted);
     }
 
     @GetMapping("/GetAllReviewsForAUser")
-    public List<Reviews> GetAllReviewsForAUser(@RequestParam int userId, @RequestParam int resultsPerPage, @RequestParam int page) {
-        return reviewsService.FindAllReviewsForUser(userId, resultsPerPage, page);
+    public List<Reviews> GetAllReviewsForAUser(@RequestParam int userId, @RequestParam int resultsPerPage, @RequestParam int page, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")Date datePosted) {
+        return reviewsService.FindAllReviewsForUser(userId, resultsPerPage, page, datePosted);
     }
 
     @PostMapping("/AddReviewToDatabase")
@@ -39,8 +41,8 @@ public class ReviewsControllerREST {
     }
 
     @GetMapping("/GetAllCommentsForAReview")
-    public List<Comments> GetAllCommentsForAReview(@RequestParam int reviewId, @RequestParam int page, @RequestParam int resultsPerPage) {
-        return commentsService.GetCommentsForReview(reviewId, resultsPerPage, page);
+    public List<Comments> GetAllCommentsForAReview(@RequestParam int reviewId, @RequestParam int page, @RequestParam int resultsPerPage, @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")Date datePosted) {
+        return commentsService.GetCommentsForReview(reviewId, resultsPerPage, page, datePosted);
     }
 
 

@@ -32,7 +32,7 @@ public class CommentsService {
     private UsersRepository usersRepository;
 
     @Transactional
-    public List<Comments> GetCommentsForReview(int reviewId, int resultsPerPage, int page) {
+    public List<Comments> GetCommentsForReview(int reviewId, int resultsPerPage, int page, Date datePosted) {
 
         int skip = (page - 1) * resultsPerPage;
 
@@ -41,8 +41,10 @@ public class CommentsService {
                         "JOIN Reviews reviews ON reviews = comments.review " +
                         "JOIN Users users on comments.user = users " +
                         "WHERE reviews.reviewId = :reviewId " +
+                        "AND comments.commentTimestamp < :datePosted" +
                         "ORDER BY comments.commentTimestamp DESC";
-        return entityManager.createQuery(hql, Comments.class).setParameter("reviewId", reviewId).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
+        return entityManager.createQuery(hql, Comments.class).setParameter("reviewId", reviewId)
+                .setParameter("datePosted", datePosted).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
     @Transactional
@@ -72,6 +74,6 @@ public class CommentsService {
     @Transactional
     public String DeleteCommentFromDatabase(int commentId) {
         commentsRepository.deleteById(commentId);
-        return "Successfullly removed review from repository.";
+        return "Successfully removed review from repository.";
     }
 }

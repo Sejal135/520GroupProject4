@@ -5,11 +5,10 @@ import com.example.demo.models.repositories.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import org.apache.catalina.User;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +34,12 @@ public class UsersService {
 
     @Autowired
     private FollowersRepository followersRepository;
+
+    @Autowired
+    private ItineraryReferenceTableRepository itineraryReferenceTableRepository;
+
+    @Autowired
+    private ItineraryItemRepository itineraryItemRepository;
 
     @Transactional
     public List<Preferences> FindPreferencesForUser(int userId) {
@@ -182,7 +187,8 @@ public class UsersService {
         return count;
     }
 
-    @Transactional List<Followers> GetFollowedList(int userId) {
+    @Transactional
+    public List<Followers> GetFollowedList(int userId) {
 
         Users user = usersRepository.findByUserId(userId);
 
@@ -190,5 +196,85 @@ public class UsersService {
                 "FROM Followers followers " +
                         "WHERE followers.followerId = :userId";
         return entityManager.createQuery(hql, Followers.class).setParameter("userId", user).getResultList();
+    }
+
+    @Transactional
+    public List<ItineraryItem> GetAllItemsForAnItinerary(int itineraryId) {
+
+        ItineraryReferenceTable itineraryReference = itineraryReferenceTableRepository.findByItineraryId(itineraryId);
+
+        return itineraryItemRepository.findAllByItineraryReferenceIdOrderByTimeItemAtAsc(itineraryReference);
+    }
+
+    @Transactional
+    public List<List<ItineraryItem>> GetAllItemsAUsersItineraries(int userId) {
+
+        Users user = usersRepository.findByUserId(userId);
+
+        List<ItineraryReferenceTable> allItineraries = itineraryReferenceTableRepository.findAllByUserForItineraryOrderByItineraryTimestampDesc(user);
+
+        ArrayList<List<ItineraryItem>> itineraries = new ArrayList<List<ItineraryItem>>();
+
+        for (ItineraryReferenceTable reference : allItineraries) {
+            itineraries.add(itineraryItemRepository.findAllByItineraryReferenceIdOrderByTimeItemAtAsc(reference));
+        }
+        return itineraries;
+    }
+
+    @Transactional
+    public String AddItineraryToDatabase(int userId, String itineraryName, List<ItineraryItem> itineraryItems) {
+
+        Users user = usersRepository.findByUserId(userId);
+
+        ItineraryReferenceTable reference = new ItineraryReferenceTable();
+
+        reference.setItineraryName(itineraryName);
+
+        reference.setItineraryTimestamp(new Date());
+
+        reference.setUserForItinerary(user);
+
+        itineraryReferenceTableRepository.save(reference);
+
+        for (ItineraryItem item : itineraryItems) {
+            item.setItineraryReferenceId(reference);
+            itineraryItemRepository.save(item);
+        }
+
+        return "Successfully saved itinerary information to database";
+    }
+
+    @Transactional
+    public String DeleteItineraryFromDatabase(int itineraryReferenceId) {
+        ItineraryReferenceTable reference = itineraryReferenceTableRepository.findByItineraryId(itineraryReferenceId);
+
+        List<ItineraryItem> itineraryItems = itineraryItemRepository.findAllByItineraryReferenceIdOrderByTimeItemAtAsc(reference);
+
+        for (ItineraryItem item : itineraryItems) {
+            itineraryItemRepository.delete(item);
+        }
+        itineraryReferenceTableRepository.delete(reference);
+
+        return "Successfully deleted itinerary";
+    }
+
+    @Transactional
+    public String AddItineraryItem(int itineraryReferenceId, ItineraryItem item) {
+        ItineraryReferenceTable reference = itineraryReferenceTableRepository.findByItineraryId(itineraryReferenceId);
+
+        item.setItineraryReferenceId(reference);
+
+        itineraryItemRepository.save(item);
+
+        return "Successfully saved item to itinerary";
+    }
+
+    @Transactional
+    public String DeleteItineraryItem(int itineraryItemId) {
+        ItineraryItem item = itineraryItemRepository.findByItineraryItemId(itineraryItemId);
+
+        itineraryItemRepository.delete(item);
+
+        return "Successfully deleted itinerary item";
     }
 }

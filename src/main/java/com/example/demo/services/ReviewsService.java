@@ -31,7 +31,7 @@ public class ReviewsService {
     private PlaceRepository placeRepository;
 
     @Transactional
-    public List<Reviews> FindAllReviewsForPlace(int placeId, int resultsPerPage, int page) {
+    public List<Reviews> FindAllReviewsForPlace(int placeId, int resultsPerPage, int page, Date reviewPostedTimestamp) {
 
         int skip = (page - 1) * resultsPerPage;
 
@@ -39,12 +39,13 @@ public class ReviewsService {
                 "FROM Reviews reviews " +
                         "JOIN Places places ON places = reviews.placeId " +
                         "WHERE places.placeId = :placeId " +
-                        "ORDER BY reviews.plusOneCount DESC";
-        return entityManager.createQuery(hql, Reviews.class).setParameter("placeId", placeId).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
+                        "AND reviews.timeReviewLeft < :reviewPostedTimestamp " +
+                        "ORDER BY reviews.timeReviewLeft DESC";
+        return entityManager.createQuery(hql, Reviews.class).setParameter("placeId", placeId).setParameter("reviewPostedTimestamp", reviewPostedTimestamp).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
     @Transactional
-    public List<Reviews> FindAllReviewsForUser(int userId, int resultsPerPage, int page) {
+    public List<Reviews> FindAllReviewsForUser(int userId, int resultsPerPage, int page, Date datePosted) {
 
         int skip = (page - 1) * resultsPerPage;
 
@@ -52,8 +53,9 @@ public class ReviewsService {
                 "From Reviews reviews " +
                         "JOIN Users users on users = reviews.reviewerId " +
                         "where users.userId = :userId " +
-                        "ORDER BY reviews.plusOneCount";
-        return entityManager.createQuery(hql, Reviews.class).setParameter("userId", userId).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
+                        "AND reviews.timeReviewLeft < :datePosted " +
+                        "ORDER BY reviews.timeReviewLeft";
+        return entityManager.createQuery(hql, Reviews.class).setParameter("userId", userId).setParameter("datePosted", datePosted).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
     @Transactional
