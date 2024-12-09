@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { ArrowLeft } from 'lucide-react'
+import { Client } from '@stomp/stompjs'
+import SockJS from 'sockjs-client'
 
 const Message = ({ sender, content, timestamp, isMine }) => (
   <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -12,63 +14,148 @@ const Message = ({ sender, content, timestamp, isMine }) => (
 )
 
 export default function GroupChat() {
-  const [messages, setMessages] = useState([
-    { id: 1, sender: 'Alex', content: 'Hey everyone! Excited for our trip to Tokyo next month!', timestamp: '10:30 AM', isMine: false },
-    { id: 2, sender: 'You', content: 'Me too! Has anyone been to the TeamLab Borderless museum?', timestamp: '10:32 AM', isMine: true },
-    { id: 3, sender: 'Sarah', content: 'Yes, it\'s amazing! Definitely a must-visit.', timestamp: '10:35 AM', isMine: false },
-    { id: 4, sender: 'Mike', content: 'I heard it\'s closing soon. We should book tickets ASAP!', timestamp: '10:37 AM', isMine: false },
-  ])
+  const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
+  const [username, setUsername] = useState('')
+  const [roomCode, setRoomCode] = useState('')
+  const [isConnected, setIsConnected] = useState(false)
   const messagesEndRef = useRef(null)
-
-  const members = [
-    { id: 1, name: 'You', status: 'online' },
-    { id: 2, name: 'Alex', status: 'online' },
-    { id: 3, name: 'Sarah', status: 'offline' },
-    { id: 4, name: 'Mike', status: 'online' },
-    { id: 5, name: 'Emma', status: 'offline' },
-  ]
+  const stompClientRef = useRef(null)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  useEffect(() => {
+    if (isConnected) {
+      const client = new Client({
+        brokerURL: "ws://localhost:8081/ws",
+        onConnect: () => {
+          console.log('Connected to WebSocket')
+          client.subscribe(`/topic/${roomCode}`, onMessageReceived)
+          sendJoinMessage()
+        },
+      })
+      stompClientRef.current = client
+      client.activate()
+
+      return () => {
+        if (client.connected) {
+          sendLeaveMessage()
+          client.deactivate()
+        }
+      }
+    }
+  }, [isConnected, roomCode])
+
+  const onMessageReceived = (message) => {
+    const receivedMessage = JSON.parse(message.body)
+    setMessages((prevMessages) => [...prevMessages, receivedMessage])
+  }
+
+  const sendJoinMessage = () => {
+    const joinMessage = {
+      roomId: 'public',
+      sender: username,
+      content: `${username} joined!`,
+      type: 'JOIN',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    }
+    stompClientRef.current.publish({
+      destination: `/app/chat.addUser/${roomCode}`,
+      body: JSON.stringify(joinMessage),
+    })
+  }
+
+  const sendLeaveMessage = () => {
+    const leaveMessage = {
+      roomId: 'public',
+      sender: username,
+      content: `${username} left!`,
+      type: 'LEAVE',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    }
+    stompClientRef.current.publish({
+      destination: `/app/chat.addUser/${roomCode}`,
+      body: JSON.stringify(leaveMessage),
+    })
+  }
+
+  const handleConnect = (e) => {
+    e.preventDefault()
+    if (username && roomCode) {
+      setIsConnected(true)
+    }
+  }
+
   const handleSendMessage = (e) => {
     e.preventDefault()
-    if (newMessage.trim()) {
-      const newMsg = {
-        id: messages.length + 1,
-        sender: 'You',
+    if (newMessage.trim() && stompClientRef.current) {
+      const chatMessage = {
+        roomId: 'public',
+        sender: username,
         content: newMessage,
+        type: 'CHAT',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isMine: true
       }
-      setMessages([...messages, newMsg])
+      stompClientRef.current.publish({
+        destination: `/app/chat.sendMessage/${roomCode}`,
+        body: JSON.stringify(chatMessage),
+      })
       setNewMessage('')
     }
   }
 
+  if (!isConnected) {
+    return (
+      <div className="min-h-screen bg-[#000080] text-white flex items-center justify-center">
+        <form onSubmit={handleConnect} className="bg-[#001530] p-8 rounded-lg">
+          <h2 className="text-2xl font-bold mb-4 text-[#FFDD00]">Join Chat</h2>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your username"
+            className="w-full mb-4 p-2 bg-[#000080] text-white rounded"
+          />
+          <input
+            type="text"
+            value={roomCode}
+            onChange={(e) => setRoomCode(e.target.value)}
+            placeholder="Enter room code"
+            className="w-full mb-4 p-2 bg-[#000080] text-white rounded"
+          />
+          <button type="submit" className="w-full bg-[#FFB300] text-[#000080] p-2 rounded hover:bg-[#FFDD00]">
+            Join
+          </button>
+        </form>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-[#000080] text-white flex">
-      {/* Main Chat Area */}
       <div className="flex-grow flex flex-col h-screen">
-        {/* Chat Header */}
         <div className="bg-[#001530] p-4 flex items-center justify-between">
           <div className="flex items-center">
-            <ArrowLeft className="w-6 h-6 text-[#FFDD00] mr-4 cursor-pointer" />
-            <h1 className="text-xl font-bold text-[#FFDD00]">Tokyo Travelers 2024</h1>
+            <ArrowLeft className="w-6 h-6 text-[#FFDD00] mr-4 cursor-pointer" onClick={() => setIsConnected(false)} />
+            <h1 className="text-xl font-bold text-[#FFDD00]">Room: {roomCode}</h1>
           </div>
         </div>
 
-        {/* Messages Area */}
         <div className="flex-grow overflow-y-auto p-4 space-y-4">
-          {messages.map((message) => (
-            <Message key={message.id} {...message} />
+          {messages.map((message, index) => (
+            <Message
+              key={index}
+              sender={message.sender}
+              content={message.content}
+              timestamp={message.timestamp}
+              isMine={message.sender === username}
+            />
           ))}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Message Input */}
         <form onSubmit={handleSendMessage} className="bg-[#001530] p-4 flex items-center">
           <input
             type="text"
@@ -85,3 +172,4 @@ export default function GroupChat() {
     </div>
   )
 }
+
