@@ -65,16 +65,20 @@ import { useNavigate } from "react-router-dom";
 function GoogleSignIn() {
   const [isLibraryLoaded, setIsLibraryLoaded] = useState(false);
   const navigate = useNavigate();
+  
+
+
   // Fetch functionality to get user profile information by email
   const getUserProfileByEmail = async (email) => {
     try {
-      //email = "email1@gmail.com";
+      // email = "email1@gmail.com";
       // Send GET request to fetch the user's profile information using email
       const apiUrl = 'http://localhost:8081'; // Use the supabase URL
       const response = await fetch(`${apiUrl}/GetUserProfileByEmail?email=${email}`);
+      // console.log(response)
       const jsonResponse = await response.json();
       console.log("Checking response...", jsonResponse);
-      if (jsonResponse.status == 200) {
+      if (response.status == 200) {
         navigate("/home");
       }
       else {
