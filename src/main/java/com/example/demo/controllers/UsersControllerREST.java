@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
 
+// @CrossOrigin
 @RestController
 public class UsersControllerREST {
 
@@ -67,7 +68,6 @@ public class UsersControllerREST {
         return usersService.GetUserProfile(userId);
     }
 
-    @CrossOrigin
     @GetMapping("/GetUserProfileByEmail")
     public Users GetUserProfileByEmail(@RequestParam String email) {
         return usersService.GetUserProfileByEmail(email);

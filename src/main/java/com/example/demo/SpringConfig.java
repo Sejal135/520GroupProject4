@@ -38,16 +38,18 @@ public class SpringConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf().disable()
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for testing
+                .cors(cors -> {}) // Use custom CORS configuration
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/", "/login", "/*").permitAll();
-                    registry.requestMatchers(HttpMethod.POST, "/*").permitAll();
+                    registry.requestMatchers("/", "/*").permitAll();
+                    // registry.requestMatchers(HttpMethod.POST, "/*").permitAll();
                     registry.anyRequest().authenticated();
+
                 })
                 .oauth2Login(oauth2login -> {
                     oauth2login
                             .loginPage("/")
-                            .defaultSuccessUrl("/profile", true);
+                            .defaultSuccessUrl("/home", true);
                 })
                 .build();
     }
