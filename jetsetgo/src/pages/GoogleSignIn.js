@@ -59,36 +59,49 @@
 // }
 
 // export default GoogleSignIn;
-
 import React, { useEffect, useState } from 'react';
-// Correctly import jwtDecode as a named import
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from "react-router-dom";
-
 function GoogleSignIn() {
   const [isLibraryLoaded, setIsLibraryLoaded] = useState(false);
   const navigate = useNavigate();
-
-  /* Callback function to handle the credential response */
+  // Fetch functionality to get user profile information by email
+  const getUserProfileByEmail = async (email) => {
+    try {
+      //email = "email1@gmail.com";
+      // Send GET request to fetch the user's profile information using email
+      const apiUrl = 'http://localhost:8081'; // Use the supabase URL
+      const response = await fetch(`${apiUrl}/GetUserProfileByEmail?email=${email}`);
+      const jsonResponse = await response.json();
+      console.log("Checking response...", jsonResponse);
+      if (jsonResponse.status == 200) {
+        navigate("/home");
+      }
+      else {
+        navigate("/create-profile");
+      }
+    } catch (error) {
+      console.error("Error while fetching user profile:", error);
+      navigate("/create-profile"); // In case of an error, assume the user needs to create a profile
+    }
+  };
+  // Callback function to handle the credential response
   const handleCredentialResponse = (response) => {
     console.log("Encoded JWT ID token: " + response.credential);
-
     // Decode the JWT token
-    const userObject = jwtDecode(response.credential); // Use the correct function name
+    const userObject = jwtDecode(response.credential);
     console.log("Decoded User Info: ", userObject);
-
-    // Redirect to Create Profile after successful sign-in
-    // add logic here to check if user already has a profile
-    navigate("/create-profile");
+    // Extract email from the decoded token (assuming it's available in the token)
+    const email = userObject.email; // Assuming `email` is part of the JWT token
+    // Call the getUserProfileByEmail function with the extracted email
+    getUserProfileByEmail(email);
   };
-
   useEffect(() => {
     // Load Google API client script
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.defer = true;
-    
     // Set up onload handler to initialize Google Sign-In
     script.onload = () => {
       if (window.google && window.google.accounts) {
@@ -101,15 +114,12 @@ function GoogleSignIn() {
         console.error("Google Sign-In library failed to load.");
       }
     };
-
     document.head.appendChild(script);
-
     return () => {
       // Clean up script from DOM if the component unmounts
       document.head.removeChild(script);
     };
   }, []);
-
   useEffect(() => {
     // Render the Google Sign-In button only if the library has loaded
     if (isLibraryLoaded) {
@@ -119,9 +129,7 @@ function GoogleSignIn() {
       );
     }
   }, [isLibraryLoaded]);
-
   // Only render the div for the button if the library has loaded
   return isLibraryLoaded ? <div id="signInDiv"></div> : <p>Loading...</p>;
 }
-
 export default GoogleSignIn;
