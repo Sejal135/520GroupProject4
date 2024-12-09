@@ -74,7 +74,7 @@ function GoogleSignIn() {
       const response = await fetch(`${apiUrl}/GetUserProfileByEmail?email=${email}`);
       const jsonResponse = await response.json();
       console.log("Checking response...", jsonResponse);
-      if (jsonResponse.status == 200) {
+      if (response.status == 200) {
         navigate("/home");
       }
       else {
