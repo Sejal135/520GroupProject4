@@ -204,6 +204,7 @@ export default function Home() {
       </div>
     </div>
   )
+
 }
 
 // Helper function to format date in correct format for the API
