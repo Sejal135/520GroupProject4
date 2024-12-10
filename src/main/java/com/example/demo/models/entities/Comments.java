@@ -19,7 +19,7 @@ public class Comments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
-    private int comment_id;
+    private Integer commentId;
 
     @Column(name = "comment_timestamp", nullable = false)
     private Date commentTimestamp;
@@ -31,10 +31,10 @@ public class Comments {
     private String commentContent;
 
     @ManyToOne
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "review_id", nullable = false)
     private Reviews review;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 }

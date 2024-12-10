@@ -22,7 +22,7 @@ public class Reviews {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
-    private int reviewId;
+    private Integer reviewId;
 
     @Column(name = "review_title", nullable = false, length = 65535, columnDefinition = "Text")
     private String title;

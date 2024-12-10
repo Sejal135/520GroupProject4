@@ -1,20 +1,14 @@
 package com.example.demo.services;
 
-import com.example.demo.models.entities.Places;
-import com.example.demo.models.entities.Reviews;
-import com.example.demo.models.entities.Users;
-import com.example.demo.models.repositories.PlaceRepository;
-import com.example.demo.models.repositories.ReviewsRepository;
-import com.example.demo.models.repositories.UsersRepository;
+import com.example.demo.models.entities.*;
+import com.example.demo.models.repositories.*;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
+import javax.xml.stream.events.Comment;
 import java.util.Date;
 import java.util.List;
 
@@ -33,17 +27,56 @@ public class ReviewsService {
     @Autowired
     private PlaceRepository placeRepository;
 
+    @Autowired
+    private CommentsRepository commentsRepository;
+
+    @Autowired CommentsService commentsService;
+
+    @Autowired
+    PlusOneRepository plusOneRepository;
+
     @Transactional
-    public List<Reviews> FindAllReviewsForPlace(int placeId) {
+    public List<Reviews> FindAllReviewsForPlace(int placeId, int resultsPerPage, int page, Date reviewPostedTimestamp) {
+
+        int skip = (page - 1) * resultsPerPage;
+
         String hql =
                 "FROM Reviews reviews " +
                         "JOIN Places places ON places = reviews.placeId " +
-                        "WHERE places.placeId = :placeId";
-        return entityManager.createQuery(hql, Reviews.class).setParameter("placeId", placeId).getResultList();
+                        "WHERE places.placeId = :placeId " +
+                        "AND reviews.timeReviewLeft < :reviewPostedTimestamp " +
+                        "ORDER BY reviews.timeReviewLeft DESC";
+        return entityManager.createQuery(hql, Reviews.class).setParameter("placeId", placeId).setParameter("reviewPostedTimestamp", reviewPostedTimestamp).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
+    }
+
+    @Transactional
+    public List<Reviews> FindAllReviewsForUser(int userId, int resultsPerPage, int page, Date datePosted) {
+
+        int skip = (page - 1) * resultsPerPage;
+
+        String hql =
+                "From Reviews reviews " +
+                        "JOIN Users users on users = reviews.reviewerId " +
+                        "where users.userId = :userId " +
+                        "AND reviews.timeReviewLeft < :datePosted " +
+                        "ORDER BY reviews.timeReviewLeft";
+        return entityManager.createQuery(hql, Reviews.class).setParameter("userId", userId).setParameter("datePosted", datePosted).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
     @Transactional
     public String AddReviewToDatabase(String title, int userId, int placeId, String reviewContents) {
+
+        String hql =
+                "From Reviews reviews " +
+                        "JOIN Users users on users = reviews.reviewerId " +
+                        "JOIN Places places on reviews.placeId = places " +
+                        "where users.userId = :userId and places.placeId = :placeId";
+
+        List<Reviews> reviews = entityManager.createQuery(hql, Reviews.class).setParameter("userId", userId).setParameter("placeId", placeId).getResultList();
+        if (!reviews.isEmpty()) {
+            return "User already has review on this place";
+        }
+
         Reviews review = new Reviews();
         review.setTitle(title);
         review.setReview(reviewContents);
@@ -64,9 +97,17 @@ public class ReviewsService {
 
     @Transactional
     public String DeleteReviewFromDatabase(int reviewId) {
-        reviewsRepository.deleteById(reviewId);
-        return "Successfullly removed review from repository.";
-    }
+        Reviews review = reviewsRepository.findByReviewId(reviewId);
+        List<Comments> commentsList = commentsRepository.findAllByReview(review);
 
+        List<PlusOnes> reviewPlusOnes = plusOneRepository.findAllByReviewId(review);
+
+        commentsService.DeleteMultipleCommentsFromDatabase(commentsList);
+
+        plusOneRepository.deleteAll(reviewPlusOnes);
+
+        reviewsRepository.deleteById(reviewId);
+        return "Successfully removed review from repository.";
+    }
 
 }

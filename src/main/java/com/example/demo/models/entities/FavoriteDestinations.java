@@ -5,29 +5,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-
-
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "Group Members")
-public class GroupMembers {
+@Table(name = "Favorite Destinations")
+public class FavoriteDestinations {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    private Integer memberId;
-
-    @Column(name = "joined_at", nullable = false)
-    private Date joinedAt;
+    @Column(name = "FavoritePlacesEntryId")
+    private Integer favoritePlaceEntryId;
 
     @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
-    private GroupChats groupId;
+    @JoinColumn(name = "place_id", nullable = false)
+    private Places placeId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

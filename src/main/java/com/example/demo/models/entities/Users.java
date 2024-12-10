@@ -21,11 +21,34 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private int userId;
+    private Integer userId;
 
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
+
+    @Column(name = "bio", length = 65535, columnDefinition = "Text")
+    private String bio;
+
+    @Column(name = "profile_pic", length = 65535, columnDefinition = "Text")
+    private String profilePic;
+
+    @Column(name = "email", length = 1000, nullable = false, unique = true)
+    private String email;
+
+    @OneToOne
+    @JoinColumn(name = "social_media_links_id")
+    private SocialMediaLinks socialMediaLinks;
+
+    @Column(name = "location")
+    private String location;
+
+    @Column(name = "date_of_birth", nullable = false)
+    private Date birthDay;
+
+    // Social media links will go here
+
+
 }
