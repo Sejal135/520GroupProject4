@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Compass, Users, Share2, MapPin } from 'lucide-react';
-
+import React, { useState, useEffect } from 'react'
+import { Compass, Flame, Globe, Heart, MessageCircle, Share2, MapPin, Users } from 'lucide-react'
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('trending');
