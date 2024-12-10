@@ -38,7 +38,7 @@ const mapPreferencesToApiNames = (preferences) => {
   return preferences.map(pref => preferenceMap[pref] || pref);
 };
 
-export default function CreateProfile() {
+export default function EditProfile() {
   const [formData, setFormData] = useState({
     username: '',
     date_of_birth: '',
