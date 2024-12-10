@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from 'react'
 import { Users, Plus, Search, MessageSquare, UserPlus } from 'lucide-react'
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
 
 
 const ChatItem = ({ name, lastMessage, unreadCount }) => (
@@ -26,7 +27,9 @@ export default function GroupChatsPage() {
     const [activeTab, setActiveTab] = useState('my-chats')
     const [newGroupName, setNewGroupName] = useState('')
     const [publicChats, setPublicChats] = useState([]); // State to hold fetched public chats
+    const [userId, setUserId] = useState('')
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true);
 
     const myChats = [
         { id: 1, name: "Tokyo Travelers 2024", lastMessage: "Can't wait for the cherry blossoms!", unreadCount: 3 },
@@ -60,6 +63,42 @@ export default function GroupChatsPage() {
         fetchPublicChats();
     }, []);
 
+    useEffect(() => {
+        const fetchProfileData = async () => {
+          try {
+            const token = localStorage.getItem('jwtToken');
+            if (token) {
+    
+              // Step 1 
+              const decodedToken = jwtDecode(token);
+              const email = decodedToken.email;
+    
+              // Step 2 
+              // Fetch user profile by email
+              const profileResponse = await fetch(`http://localhost:8081/GetUserProfileByEmail?email=${email}`);
+              if (!profileResponse.ok) {
+                throw new Error('Failed to fetch profile data');
+              }
+              const profileJson = await profileResponse.json();
+    
+              const userId = profileJson.userId;
+    
+              // Update the state with fetched data
+              setUserId(userId);
+            } else {
+              console.error('JWT token not found in localStorage.');
+            }
+          } catch (error) {
+            console.error('Error fetching profile data:', error);
+          } finally {
+            setIsLoading(false);
+          }
+        };
+    
+        fetchProfileData();
+      }, []);
+
+      console.log("UserId,", userId)
     
 
     const handleCreateGroup = (e) => {
