@@ -1,70 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { Compass, Users, Share2, MapPin } from 'lucide-react';
-
+import React, { useState, useEffect } from 'react'
+import { Compass, Flame, Globe, Heart, MessageCircle, Share2, MapPin, Users } from 'lucide-react'
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('following');
-  const [query, setQuery] = useState('');
-  const [locations, setLocations] = useState([]);
-  const [reviews, setReviews] = useState([]); // State to hold fetched reviews
-  const [selectedPlaceId, setSelectedPlaceId] = useState(null); // To store selected placeId
+  const [activeTab, setActiveTab] = useState('trending');
+  const [userId, setUserId] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const navigate = useNavigate();
 
-  // Fetch locations from backend API whenever the query changes
+
   useEffect(() => {
-    console.log("Current Sejal:", query); //
-    if (query.trim() === '') {
-      setLocations([]);
-      return;
-    }
-    
-    
-
-    const fetchLocations = async () => {
+    const fetchProfileData = async () => {
       try {
-        const response = await fetch(`http://localhost:8081/GetPlacesByPlacename?placename=${query}&resultsPerPage=5&page=1`);
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Divyam",response); //
-          setLocations(data);
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
+          // Step 1: Decode token to get email
+          const decodedToken = jwtDecode(token);
+          const email = decodedToken.email;
+
+          // Step 2: Fetch user profile by email
+          const profileResponse = await fetch(`http://localhost:8081/GetUserProfileByEmail?email=${email}`);
+          if (!profileResponse.ok) {
+            throw new Error('Failed to fetch profile data');
+          }
+          const profileJson = await profileResponse.json();
+          console.log('Fetched profile data:', profileJson);
+          // Set userId
+          setUserId(profileJson.userId);
         } else {
-          console.error('Failed to fetch locations');
+          console.error('JWT token not found in localStorage.');
         }
       } catch (error) {
-        console.error('Error fetching locations:', error);
-      } 
+        console.error('Error fetching profile data:', error);
+      }
     };
-    
-    fetchLocations();
-    console.log("Post Sejal:", query); //
-fetchLocations();
 
-  }, [query]);
+    fetchProfileData();
+  }, []); // Run once when the component mounts
 
-  // Fetch reviews for the selected place whenever the selectedPlaceId changes
   useEffect(() => {
-    console.log("Selected Place ID:", selectedPlaceId); //
-    if (!selectedPlaceId) return;
+    const fetchPosts = async () => {
+      if (!userId) return; // Wait until userId is available
 
-    const fetchReviews = async () => {
+      console.log('Fetching posts for userId:', userId);
+      const date = new Date();
+      const isoDate = getCustomISODate(date);
+      console.log('Formatted date:', isoDate);
+      console.log(`http://localhost:8081/GetExplorerPageSuggestions?userId=${userId}&page=1&resultsPerPage=10&datePosted=${encodeURIComponent(isoDate)}`);
+      console.log(`http://localhost:8081/GetExplorerPageSuggestions?userId=${userId}&page=1&resultsPerPage=10&datePosted=${isoDate}`);
       try {
-        const response = await fetch(`http://localhost:8081/GetAllReviewsForAPlace?placeId=${selectedPlaceId}&resultsPerPage=5&page=1&datePosted=2024-12-10T18:22:57.000-00:00`);
-        console.log("Sanjana",response);
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Data",data);
-          setReviews(data);
-        } else {
-          console.error('Failed to fetch reviews');
-        }
-      } catch (error) {
-        console.error('Error fetching reviews:', error);
-      } 
-    };
-    console.log("Reviews:", reviews);
-    fetchReviews();
-  }, [selectedPlaceId]);
+        const response = await fetch(
+          `http://localhost:8081/GetExplorerPageSuggestions?userId=${userId}&page=1&resultsPerPage=10&datePosted=${encodeURIComponent(isoDate)}`
+        );
 
-  
+        if (!response.ok) {
+          throw new Error('Failed to fetch posts');
+        }
+
+        const data = await response.json();
+        console.log('Fetched posts:', data);
+        setPosts(data.posts || []); // Adjust if the API returns a different structure
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, [userId]); // Runs when userId is updated
+
+
   return (
     <div className="min-h-screen bg-[#000080] text-white">
       <div className="container mx-auto px-4 py-8">
@@ -137,7 +142,16 @@ fetchLocations();
                     className="w-10 h-10 rounded-full"
                   />
                   <div>
-                    <h3 className="font-semibold">{review.reviewerId.username}</h3>
+                  <h3
+                    className="font-semibold cursor-pointer text-[#FFDD00] hover:text-[#FFB300]"
+                    onClick={() => navigate(`/profile/${post.user.name}`)}
+                  >
+                    {post.user.name}
+                  </h3>
+                    <div className="flex items-center text-sm text-[#FFDD00]">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      {post.user.location}
+                    </div>
                   </div>
                 </div>
                 {/* Share Button */}
@@ -158,4 +172,24 @@ fetchLocations();
     </div>
   );
   
+}
+
+// Helper function to format date in correct format for the API
+function getCustomISODate(date) {
+  // Get the components of the ISO string without the timezone info
+  const isoString = date.toISOString();
+  
+  // Extract the date part (without 'Z') and the milliseconds
+  const datePart = isoString.slice(0, -1); // Remove the 'Z'
+  
+  // Get the timezone offset in hours and minutes
+  const timezoneOffset = -date.getTimezoneOffset(); // Offset in minutes
+  
+  // Format the timezone as needed (e.g., "-05:00")
+  const hoursOffset = String(Math.floor(Math.abs(timezoneOffset) / 60)).padStart(2, '0');
+  const minutesOffset = String(Math.abs(timezoneOffset) % 60).padStart(2, '0');
+  const formattedOffset = (timezoneOffset < 0 ? '-' : '+') + hoursOffset + ':' + minutesOffset;
+  
+  // Combine everything to form the final format
+  return datePart + formattedOffset;
 }
