@@ -13,27 +13,32 @@ public class ChatControllerREST {
     @Autowired
     GroupChatInfoService groupChatInfoService;
 
+    @CrossOrigin
     @GetMapping("/GetAllGroupChatsInfo")
     public List<GroupChats> listAllGroupChatMessages(@RequestParam int resultsPerPage, @RequestParam int page) {
         List<GroupChats> groupChatsList = groupChatInfoService.findGroupChatsWithHqlQuery(resultsPerPage, page);
         return groupChatsList;
     }
 
+    @CrossOrigin
     @GetMapping("/GetAllGroupsForUser")
     public List<GroupChats> GetAllGroupsForUser(@RequestParam int userId, @RequestParam int resultsPerPage, @RequestParam int page) {
         return groupChatInfoService.findGroupChatsForUser(userId, resultsPerPage, page);
     }
 
+    @CrossOrigin
     @PostMapping("/CreateGroupChat")
     public String CreateGroupChat(@RequestParam int userId, @RequestParam String chatName) {
         return groupChatInfoService.CreateGroupChat(userId, chatName);
     }
 
+    @CrossOrigin
     @DeleteMapping("/DeleteGroupChat")
     public String DeleteGroupChat(@RequestParam int userId) {
         return groupChatInfoService.RemoveGroupChat(userId);
     }
 
+    @CrossOrigin
     @GetMapping("/SearchGroupChatsBySubstring")
     public List<GroupChats> GetGroupChatsByGroupNameSubstring(@RequestParam String groupName, @RequestParam int maxResults) {
         return groupChatInfoService.GetGroupChatsBySubstring(groupName, maxResults);

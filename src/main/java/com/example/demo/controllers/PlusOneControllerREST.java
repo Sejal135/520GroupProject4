@@ -15,21 +15,25 @@ public class PlusOneControllerREST {
     PlusOneService plusOneService;
 
 
+    @CrossOrigin
     @GetMapping("/IncrementPlusOne")
     public String IncrementPlusOne(@RequestParam int reviewId, @RequestParam int userId) {
         return plusOneService.IncrementPlusOne(reviewId, userId);
     }
 
+    @CrossOrigin
     @GetMapping("/DecrementPlusOne")
     public String DecrementPlusOne(@RequestParam int reviewId, @RequestParam int userId) {
         return plusOneService.DecrementPlusOne(reviewId, userId);
     }
 
+    @CrossOrigin
     @GetMapping("/IncrementCommentPlusOne")
     public String IncrementCommentPlusOne(@RequestParam int commentId, @RequestParam int userId) {
         return plusOneService.IncrementCommentPlusOne(commentId, userId);
     }
 
+    @CrossOrigin
     @GetMapping("/DecrementCommentPlusOne")
     public String DecrementCommentPlusOne(@RequestParam int commentId, @RequestParam int userId) {
         return plusOneService.DecrementPlusOneForComment(commentId, userId);

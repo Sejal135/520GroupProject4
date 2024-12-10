@@ -20,26 +20,31 @@ public class ReviewsControllerREST {
     @Autowired
     CommentsService commentsService;
 
+    @CrossOrigin
     @GetMapping("/GetAllReviewsForAPlace")
     public List<Reviews> GetAllReviewsForAPlace(@RequestParam int placeId, @RequestParam int resultsPerPage, @RequestParam int page, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")Date datePosted) {
         return reviewsService.FindAllReviewsForPlace(placeId, resultsPerPage, page, datePosted);
     }
 
+    @CrossOrigin
     @GetMapping("/GetAllReviewsForAUser")
     public List<Reviews> GetAllReviewsForAUser(@RequestParam int userId, @RequestParam int resultsPerPage, @RequestParam int page, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")Date datePosted) {
         return reviewsService.FindAllReviewsForUser(userId, resultsPerPage, page, datePosted);
     }
 
+    @CrossOrigin
     @PostMapping("/AddReviewToDatabase")
     public String AddReviewToDatabase(@RequestParam String title, @RequestParam int userId, int placeId, String reviewContents) {
         return reviewsService.AddReviewToDatabase(title, userId, placeId, reviewContents);
     }
 
+    @CrossOrigin
     @DeleteMapping("/DeleteReview")
     public String DeleteReviewFromDatabase(@RequestParam int reviewId) {
         return reviewsService.DeleteReviewFromDatabase(reviewId);
     }
 
+    @CrossOrigin
     @GetMapping("/GetAllCommentsForAReview")
     public List<Comments> GetAllCommentsForAReview(@RequestParam int reviewId, @RequestParam int page, @RequestParam int resultsPerPage, @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")Date datePosted) {
         return commentsService.GetCommentsForReview(reviewId, resultsPerPage, page, datePosted);
