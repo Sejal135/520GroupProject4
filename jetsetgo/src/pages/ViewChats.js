@@ -30,6 +30,10 @@ export default function GroupChatsPage() {
     const [userId, setUserId] = useState('')
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState(''); // State for the search input
+
+
+
 
     const myChats = [
         { id: 1, name: "Tokyo Travelers 2024", lastMessage: "Can't wait for the cherry blossoms!", unreadCount: 3 },
@@ -99,16 +103,79 @@ export default function GroupChatsPage() {
       }, []);
 
       console.log("UserId,", userId)
+      const fetchPublicChats = async (search, maxResults = 10) => {
+        try {
+            setIsLoading(true); // Set loading state to true before fetching
+            const response = await fetch(`http://localhost:8081/SearchGroupChatsBySubstring?groupName=${search}&maxResults=${maxResults}`);
+            if (response.ok) {
+                const chats = await response.json();
+                console.log("fetched chats from search", chats)
+                setPublicChats(chats); // Update the state with the fetched chats
+            } else {
+                console.error('Failed to fetch public chats');
+            }
+        } catch (error) {
+            console.error('Error fetching public chats:', error);
+        } finally {
+            setIsLoading(false); // Set loading state to false after fetching
+        }
+    };
+
+    const handleBlur = async () => {
+        if (searchTerm.trim()) {
+            fetchPublicChats(searchTerm); // Fetch public chats if there's a search term
+        } else {
+            try {
+                // Adjust the endpoint according to your backend API
+                const response = await fetch(`http://localhost:8081/GetAllGroupChatsInfo?resultsPerPage=10&page=1`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setPublicChats(data); // Set the fetched data to state
+                } else {
+                    console.error('Failed to fetch public chats');
+                }
+            } catch (error) {
+                console.error('Error fetching public chats:', error);
+            }
+        }
+    }; 
     
 
-    const handleCreateGroup = (e) => {
+    const handleCreateGroup = async (e) => {
         e.preventDefault()
         console.log('Creating new group:', newGroupName)
-        const createdChat = { id: 7, name: newGroupName, members: 1280 }
+     //   const createdChat = { id: 7, name: newGroupName, members: 1280 }
         // Here you would typically handle the group creation logic
-        if (newGroupName){
+        if (newGroupName.trim()){
             setNewGroupName('')
-            navigate('/chat', { state: { createdChat } }); // Pass the full chat object in the state
+            var res;
+            try {
+                // Send a POST request to create a new group chat
+                const response = await fetch(`http://localhost:8081/CreateGroupChat?userId=${userId}&chatName=${newGroupName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json', // Set the content type to JSON
+                    },
+                });
+                    console.log(response)
+                if (response.ok) {
+                    const result = await response.text();
+                    res = result;
+                    console.log('Group chat created:', result);
+                    
+                    // You can handle the response, such as navigating to the new chat
+                } else {
+                    throw new Error('Failed to create group chat');
+                }
+            } catch (error) {
+                console.log(error)
+            }
+            if(res.includes("Success")){
+                const createdChat = { name: newGroupName }
+                navigate('/chat', { state: { createdChat } }); // Pass the full chat object in the state
+            }
+           
+           
         }
     } 
 
@@ -118,6 +185,10 @@ export default function GroupChatsPage() {
         console.log("test", joinedChat)
         navigate('/chat', { state: { joinedChat } });  // Pass the full chat object in the state
     };
+
+    if (isLoading) {
+        return <div className="min-h-screen bg-navy-blue text-white text-center py-20">Loading...</div>;
+      }
 
     return (
         <div className="min-h-screen bg-[#000080] text-white p-6">
@@ -132,6 +203,9 @@ export default function GroupChatsPage() {
                         <input
                             type="text"
                             placeholder="Search for public rooms"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)} // Update search term on change
+                            onBlur={handleBlur}
                             className="w-full p-3 pl-10 rounded-lg bg-[#000080] text-white border border-[#FFDD00] focus:outline-none focus:border-[#FFB300]"
                         />
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FFDD00]" />

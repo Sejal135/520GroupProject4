@@ -72,6 +72,7 @@ function GoogleSignIn() {
   const getUserProfileByEmail = async (email) => {
     try {
       // email = "email1@gmail.com";
+      console.log("Fetching user profile for email:", email);
       // Send GET request to fetch the user's profile information using email
       const apiUrl = 'http://localhost:8081'; // Use the supabase URL
       const response = await fetch(`${apiUrl}/GetUserProfileByEmail?email=${email}`);
@@ -92,11 +93,14 @@ function GoogleSignIn() {
   // Callback function to handle the credential response
   const handleCredentialResponse = (response) => {
     console.log("Encoded JWT ID token: " + response.credential);
+    
+    localStorage.setItem('jwtToken', response.credential);
     // Decode the JWT token
     const userObject = jwtDecode(response.credential);
     console.log("Decoded User Info: ", userObject);
     // Extract email from the decoded token (assuming it's available in the token)
     const email = userObject.email; // Assuming `email` is part of the JWT token
+    console.log("User email:", email);
     // Call the getUserProfileByEmail function with the extracted email
     getUserProfileByEmail(email);
   };

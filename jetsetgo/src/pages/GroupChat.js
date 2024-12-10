@@ -93,6 +93,7 @@ import SockJS from 'sockjs-client'
 import Stomp from '@stomp/stompjs'; // Or your preferred STOMP library
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
 
 const Message = ({ sender, content, timestamp, isMine }) => (
   <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -114,21 +115,55 @@ export default function GroupChat() {
   const stompClientRef = useRef(null)
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
   const { joinedChat } = location.state || {};
   const { createdChat } = location.state || {};
 
-  
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
+
+          // Step 1 
+          const decodedToken = jwtDecode(token);
+          const email = decodedToken.email;
+
+          // Step 2 
+          // Fetch user profile by email
+          const profileResponse = await fetch(`http://localhost:8081/GetUserProfileByEmail?email=${email}`);
+          if (!profileResponse.ok) {
+            throw new Error('Failed to fetch profile data');
+          }
+          const profileJson = await profileResponse.json();
+
+          // Update the state with fetched data
+          setUsername(profileJson.username);
+        } else {
+          console.error('JWT token not found in localStorage.');
+        }
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+  console.log("username!", username)
 
   useEffect(() => {
     if (joinedChat) {
         // Set roomCode to the joinedChat's name and username to "exampleUser"
         setRoomCode(joinedChat.groupName); // Set roomCode to joinedChat.name
-        setUsername('exampleUser'); // Set username to "exampleUser"
+       // setUsername('exampleUser'); // Set username to "exampleUser"
     } 
     if (createdChat) {
       // Set roomCode to the joinedChat's name and username to "exampleUser"
       setRoomCode(createdChat.name); // Set roomCode to joinedChat.name
-      setUsername('chatCreator'); // Set username to "exampleUser"
+     // setUsername('chatCreator'); // Set username to "exampleUser"
   }
 }, [joinedChat, createdChat]); // Dependency array ensures it runs when chat is updated
 
@@ -252,6 +287,10 @@ export default function GroupChat() {
         handleConnect(); // Call handleConnect after setting the username
     }
 }, [username]); //
+
+if (isLoading) {
+  return <div className="min-h-screen bg-navy-blue text-white text-center py-20">Loading...</div>;
+}
 
   if (!isConnected) {
     return (

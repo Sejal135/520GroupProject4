@@ -151,6 +151,8 @@ import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { jwtDecode } from 'jwt-decode';
 import { Link } from 'react-router-dom';
+import supabase from './supabaseClient';
+
 
 const preferenceLabels = {
   ADVENTURE_TRAVELER: "Adventurous",
@@ -177,6 +179,8 @@ const preferenceLabels = {
 };
 
 
+
+
 export default function Profile() {
   const [profileData, setProfileData] = useState({
     name: '',
@@ -188,6 +192,9 @@ export default function Profile() {
     itineraries: [],
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState('');
+  const [profileUrl, setProfileUrl] = useState(null); // State to store the profile picture URL
+  
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -208,6 +215,7 @@ export default function Profile() {
           const profileJson = await profileResponse.json();
 
           const userId = profileJson.userId;
+          setUserId(userId)
 
           // Fetch follower count
           const followerResponse = await fetch(`http://localhost:8081/GetFollowerCount?userId=${userId}`);
@@ -254,17 +262,57 @@ export default function Profile() {
     fetchProfileData();
   }, []);
 
+  const getUserProfile = async (userId) => {
+    try {
+      console.log("user Id!!!", userId)
+      // Query the users table to get the profile pic for a specific user
+      const { data, error } = await supabase
+        .from('users')
+        .select('profile_pic') // Retrieve only the profile_pic field
+        .eq('user_id', userId);  // Ensure you replace `userId` with the actual ID of the user you want to retrieve
+
+      if (error) {
+        throw error;
+      }
+  
+      if (data && data.length > 0) {
+        const profilePicUrl = data[0].profile_pic; // Get the profile_pic URL from the result
+        console.log("Profile pic URL:", profilePicUrl);
+        return profilePicUrl;
+      } else {
+        console.log('No user found or profile pic is missing');
+        return null;
+      }
+    } catch (error) {
+      console.error("Error retrieving user profile:", error.message);
+      return null;
+    }
+  };
+
+   // Fetch user profile when the component mounts or when userId changes
+   useEffect(() => {
+    const fetchProfile = async () => {
+      if (userId) {
+        const profilePicUrl = await getUserProfile(userId);
+        setProfileUrl(profilePicUrl); // Update state with the profile picture URL
+        setIsLoading(false); // Set loading to false once data is fetched
+      }
+    };
+
+    fetchProfile(); // Call the function to fetch profile data
+  }, [userId]); // Run this effect whenever userId changes 
+
   if (isLoading) {
     return <div className="min-h-screen bg-navy-blue text-white text-center py-20">Loading...</div>;
   }
-
+  console.log(profileUrl)
   return (
     <div className="min-h-screen bg-navy-blue text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row gap-6 items-start mb-8">
           <img
-            src="/placeholder.svg" // Replace with the user's profile picture URL if available
+             src={profileUrl || "/placeholder.svg"}  // Use profileUrl if available, else fallback to the placeholder
             alt="Profile picture"
             className="w-[200px] h-[200px] rounded-3xl object-cover"
           />
