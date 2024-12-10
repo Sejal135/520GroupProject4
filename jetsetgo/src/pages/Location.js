@@ -1,86 +1,158 @@
-import React, { useState } from 'react'
-import { ThumbsUp, MessageSquare } from 'lucide-react'
+import React, { useState, useEffect } from "react";
 
-const Review = ({ title, author, date, content, likes, onLike, onComment }) => (
+const Review = ({
+  title,
+  reviewerName,
+  reviewText,
+  plusOneCount,
+  profilePic,
+  reviewId,
+  userId,
+  handlePlusOne,
+}) => (
   <div className="bg-[#001530] p-4 rounded-lg mb-4">
-    <div className="flex justify-between items-center mb-2">
+    <div className="flex items-center gap-3 mb-4">
+      <img
+        src={profilePic || "/default-avatar.png"}
+        alt={reviewerName}
+        className="w-10 h-10 rounded-full"
+      />
       <div>
-        <h3 className="font-semibold text-[#FFDD00]">{author}</h3>
-        <p className="text-sm text-[#FFDD00]/70">{date}</p>
+        <h3 className="font-semibold text-[#FFDD00]">{reviewerName}</h3>
       </div>
     </div>
     <h4 className="text-lg font-bold text-[#FFB300] mb-2">{title}</h4>
-    <p className="text-white mb-4">{content}</p>
-    <div className="flex justify-between items-center">
-      <button 
-        onClick={onLike}
-        className="flex items-center text-[#FFDD00] hover:text-[#FFB300]"
+    <p className="text-white mb-4">{reviewText}</p>
+    <div className="flex items-center gap-4 text-[#FFDD00]">
+      <button
+        className="flex items-center gap-1 hover:text-[#FFB300]"
+        onClick={() => handlePlusOne(reviewId, userId)}
       >
-        <ThumbsUp className="w-4 h-4 mr-2" />
-        Recommend ({likes})
-      </button>
-      <button 
-        onClick={onComment}
-        className="flex items-center text-[#FFDD00] hover:text-[#FFB300]"
-      >
-        <MessageSquare className="w-4 h-4 mr-2" />
-        Comment
+        +1 ({plusOneCount})
       </button>
     </div>
   </div>
-)
+);
 
-export default function Location() {
-  const [reviews, setReviews] = useState([
-    { id: 1, title: 'Incredible Blend of Modern and Traditional', author: 'Alex Chen', date: '2024-03-15', content: 'Tokyo is an incredible blend of modern technology and traditional culture. The city never sleeps, and there\'s always something new to discover!', likes: 24 },
-    { id: 2, title: 'Efficient Transportation', author: 'Sarah Johnson', date: '2024-03-10', content: 'I was amazed by the efficiency of Tokyo\'s public transportation. It made exploring the city so easy and convenient.', likes: 18 },
-    { id: 3, title: 'Unparalleled Food Scene', author: 'Mike Thompson', date: '2024-03-05', content: 'The food scene in Tokyo is unparalleled. From high-end sushi restaurants to street food, every meal was an adventure.', likes: 32 },
-  ])
+function LocationPage({
+  query = "Amherst House of Pizza",
+  selectedPlaceId = 1,
+  userId = 1,
+}) {
+  const [locations, setLocations] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [newTitle, setNewTitle] = useState("");
+  const [newComment, setNewComment] = useState("");
+  const [message, setMessage] = useState("");
 
-  const [newTitle, setNewTitle] = useState('')
-  const [newComment, setNewComment] = useState('')
-
-  const handleLike = (reviewId) => {
-    setReviews(reviews.map(review => 
-      review.id === reviewId ? { ...review, likes: review.likes + 1 } : review
-    ))
-  }
-
-  const handleComment = (reviewId) => {
-    console.log(`Opening comment form for review ${reviewId}`)
-  }
-
-  const handleSubmitComment = (e) => {
-    e.preventDefault()
-    if (newComment.trim() && newTitle.trim()) {
-      const newReview = {
-        id: reviews.length + 1,
-        title: newTitle,
-        author: 'You',
-        date: new Date().toISOString().split('T')[0],
-        content: newComment,
-        likes: 0
+  // Fetch locations based on the query
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8081/GetPlacesByPlacename?placename=${query}&resultsPerPage=5&page=1`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setLocations(data);
+        } else {
+          console.error("Failed to fetch locations");
+        }
+      } catch (error) {
+        console.error("Error fetching locations:", error);
       }
-      setReviews([newReview, ...reviews])
-      setNewTitle('')
-      setNewComment('')
-    }
-  }
+    };
+    fetchLocations();
+  }, [query]);
 
+  // Fetch reviews for the selected place
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8081/GetAllReviewsForAPlace?placeId=${selectedPlaceId}&resultsPerPage=5&page=1&datePosted=2025-12-10T18:22:57.000-00:00`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setReviews(data);
+        } else {
+          console.error("Failed to fetch reviews");
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+    fetchReviews();
+  }, [selectedPlaceId]);
+
+  // Handle review submission
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+
+    if (!newTitle.trim() || !newComment.trim()) {
+      setMessage("Title and comment are required.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8081/AddReviewToDatabase?title=${encodeURIComponent(
+          newTitle
+        )}&userId=${userId}&placeId=${selectedPlaceId}&reviewContents=${encodeURIComponent(
+          newComment
+        )}`,
+        { method: "POST" }
+      );
+
+      if (response.ok) {
+        setMessage("Review Submitted");
+        setNewTitle("");
+        setNewComment("");
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to add review:", errorData);
+        setMessage("Failed to submit the review.");
+      }
+    } catch (error) {
+      console.error("Error adding review:", error);
+      setMessage("An error occurred while submitting the review.");
+    }
+  };
+
+  // Handle Plus One functionality
+  const handlePlusOne = async (reviewId, userId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8081/IncrementPlusOne?reviewId=${reviewId}&userId=${userId}`
+      );
+      if (response.ok) {
+        const updatedCount = await response.json();
+        setReviews((prevReviews) =>
+          prevReviews.map((review) =>
+            review.reviewId === reviewId
+              ? { ...review, plusOneCount: updatedCount }
+              : review
+          )
+        );
+      } else {
+        console.error("Failed to increment +1");
+      }
+    } catch (error) {
+      console.error("Error incrementing +1:", error);
+    }
+  };
+
+  // JSX for the page
   return (
     <div className="min-h-screen bg-[#000080] text-white p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-[#FFDD00] mb-4">Tokyo, Japan</h1>
-        <div className="mb-8">
-          <img 
-            src="/placeholder.svg" 
-            alt="Tokyo Skyline" 
-            className="w-full h-64 object-cover rounded-lg"
-          />
-        </div>
+        <h1 className="text-4xl font-bold text-[#FFDD00] mb-4">{query}</h1>
 
+        {/* Review Submission Section */}
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-[#FFDD00] mb-4">Write a Review</h2>
+          <h2 className="text-2xl font-semibold text-[#FFDD00] mb-4">
+            Write a Review
+          </h2>
           <form onSubmit={handleSubmitComment} className="space-y-4">
             <input
               type="text"
@@ -96,27 +168,44 @@ export default function Location() {
               className="w-full p-3 rounded-lg bg-[#001530] text-white border border-[#FFDD00] focus:outline-none focus:border-[#FFB300]"
               rows="4"
             />
-            <button 
+            <button
               type="submit"
               className="bg-[#FFB300] text-[#000080] px-6 py-2 rounded-lg hover:bg-[#FFDD00]"
             >
               Submit Review
             </button>
           </form>
+          {message && <p className="text-center mt-4">{message}</p>}
         </div>
 
+        {/* Reviews Section */}
         <div>
-          <h2 className="text-2xl font-semibold text-[#FFDD00] mb-4">User Reviews</h2>
-          {reviews.map(review => (
-            <Review 
-              key={review.id}
-              {...review}
-              onLike={() => handleLike(review.id)}
-              onComment={() => handleComment(review.id)}
-            />
-          ))}
+          <h2 className="text-2xl font-semibold text-[#FFDD00] mb-4">
+            User Reviews
+          </h2>
+          {reviews.length === 0 ? (
+            <p className="text-center text-gray-500">
+              No reviews found for this location.
+            </p>
+          ) : (
+            reviews.map((review) => (
+              <Review
+                key={review.reviewId}
+                title={review.title}
+                reviewerName={review.reviewerId.username}
+                reviewText={review.review}
+                plusOneCount={review.plusOneCount}
+                profilePic={review.reviewerId.profilePic}
+                reviewId={review.reviewId}
+                userId={userId}
+                handlePlusOne={handlePlusOne}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
-  )
+  );
 }
+
+export default LocationPage;
