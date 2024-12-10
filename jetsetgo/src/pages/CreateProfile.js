@@ -483,7 +483,7 @@ export default function CreateProfile() {
           bio: formData.bio,
           location: formData.location,
           email: formData.email,
-          profile_pic: url,
+          profilePic: url,
         }),
       });
       console.log(userResponse)
