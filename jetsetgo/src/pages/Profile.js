@@ -150,6 +150,7 @@ import { Card, CardHeader } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { jwtDecode } from 'jwt-decode';
+import { Link } from 'react-router-dom';
 
 const preferenceLabels = {
   ADVENTURE_TRAVELER: "Adventurous",
@@ -275,7 +276,11 @@ export default function Profile() {
                   {profileData.location}
                 </Badge>
               </div>
-              <Button className="bg-amber-700 hover:bg-teal-700 text-white">Follow</Button>
+              <Button className="bg-amber-700 hover:bg-teal-700 text-white">
+              <Link to="/edit-profile" className="text-white no-underline">
+                  Edit Profile
+                </Link>
+              </Button>
             </div>
 
             <p className="text-slate-300">{profileData.bio}</p>
