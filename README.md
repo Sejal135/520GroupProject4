@@ -56,6 +56,7 @@ We aim to have 5 main features in our application as listed below:
    ### Sign In:
    ![image](https://github.com/user-attachments/assets/94f2b37d-0f10-44d8-b0f7-ecfaf483a2b3)
    ![image](https://github.com/user-attachments/assets/0b723ec2-53df-4f77-8cf4-35fab9c30f04)
+   
      Upon Sign In:
      - Prompt new users to the Create Profile page.
      - Direct existing users to the Home page. 
