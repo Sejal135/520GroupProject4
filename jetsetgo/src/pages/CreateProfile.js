@@ -307,6 +307,8 @@ import React, { useState, useEffect } from 'react';
 import { Upload, Camera } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
+import supabase from './supabaseClient';
+
 
 const travelPreferenceOptions = [
   'Adventure Traveler',
@@ -367,11 +369,15 @@ export default function CreateProfile() {
     location: '',
     travelPreferences: [],
     email: '',
+    profile_pic: '',
   });
 
   const [profileImage, setProfileImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [profileUrl, setProfileUrl] = useState(''); 
+  const [userCreated, setUserCreated] = useState(false)
+  const [userId, setUserId] = useState('')
 
   const navigate = useNavigate();
 
@@ -392,7 +398,7 @@ export default function CreateProfile() {
     }
   }, []);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       setProfileImage(file);
@@ -425,9 +431,49 @@ export default function CreateProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    var url; 
+
+    const file = profileImage
+    if(file){
+      try {
+        // Fetch data from the places table
+        const { data, error } = await supabase.storage
+        .from('profile_images') // Replace with your bucket name
+        .upload(file.name, file);
+
+      if (error) {
+        throw error;
+      }
+
+        console.log("did it work?", data) 
+      } catch (error) {
+        console.error('Error uploading photo:', error.message);
+      }
+  }
+
+  if(file){
+    try{
+      const { data, error: urlError } = supabase.storage
+        .from('profile_images') 
+        .getPublicUrl(file.name);
+
+        url = data.publicUrl; 
+        setProfileUrl(url)
+        console.log("url info:", data)
+
+      if (urlError) {
+        throw urlError;
+      }
+    } catch(error){
+      console.error('error getting url:', error.message)
+    }
+  }
+
+  console.log("its here", url)
 
     try {
       console.log("Trying to create a user");
+      console.log("lets see it NOW", url)
       const userResponse = await fetch('http://localhost:8081/CreateUser', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -437,9 +483,10 @@ export default function CreateProfile() {
           bio: formData.bio,
           location: formData.location,
           email: formData.email,
+          profilePic: url,
         }),
       });
-      console.log(userResponse);
+      console.log(userResponse)
       if (!userResponse.ok) {
         const errorMsg = await userResponse.text();
         throw new Error(`Failed to create user: ${errorMsg}`);
@@ -449,6 +496,7 @@ export default function CreateProfile() {
       const response = await fetch(`${apiUrl}/GetUserProfileByEmail?email=${formData.email}`);
       const jsonResponse = await response.json();
       const userId = jsonResponse.userId;
+      setUserId(userId)
       
       if (formData.travelPreferences.length > 0) {
         console.log("Trying to set travel preferences");
@@ -458,11 +506,12 @@ export default function CreateProfile() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(mappedPreferences.map(pref => ({ preference: pref }))),
         });
-
+        
         if (!preferencesResponse.ok) {
           const errorMsg = await preferencesResponse.text();
           throw new Error(`Failed to create preferences: ${errorMsg}`);
         }
+        setUserCreated(true)
       }
 
       navigate('/profile');
@@ -474,6 +523,7 @@ export default function CreateProfile() {
     }
   };
 
+  
   return (
     <div className="min-h-screen bg-[#000080] py-12 px-4">
       <div className="max-w-2xl mx-auto bg-[#001530] rounded-lg p-8">
