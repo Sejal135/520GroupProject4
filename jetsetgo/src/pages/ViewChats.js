@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect} from 'react'
 import { Users, Plus, Search, MessageSquare, UserPlus } from 'lucide-react'
+import { useNavigate } from "react-router-dom";
+
 
 const ChatItem = ({ name, lastMessage, unreadCount }) => (
     <div className="flex items-center justify-between p-4 hover:bg-[#0000E0] rounded-lg cursor-pointer transition-colors">
@@ -23,6 +25,8 @@ const ChatItem = ({ name, lastMessage, unreadCount }) => (
 export default function GroupChatsPage() {
     const [activeTab, setActiveTab] = useState('my-chats')
     const [newGroupName, setNewGroupName] = useState('')
+    const [publicChats, setPublicChats] = useState([]); // State to hold fetched public chats
+    const navigate = useNavigate();
 
     const myChats = [
         { id: 1, name: "Tokyo Travelers 2024", lastMessage: "Can't wait for the cherry blossoms!", unreadCount: 3 },
@@ -30,18 +34,51 @@ export default function GroupChatsPage() {
         { id: 3, name: "Foodie Adventurers", lastMessage: "Best paella in Barcelona?", unreadCount: 5 },
     ]
 
-    const publicChats = [
-        { id: 4, name: "Southeast Asia Explorers", members: 1280 },
-        { id: 5, name: "Digital Nomads Worldwide", members: 3500 },
-        { id: 6, name: "Sustainable Travel Tips", members: 950 },
-    ]
+    // const publicChats = [
+    //     { id: 4, name: "Southeast Asia Explorers", members: 1280 },
+    //     { id: 5, name: "Digital Nomads Worldwide", members: 3500 },
+    //     { id: 6, name: "Sustainable Travel Tips", members: 950 },
+    // ]
+
+     // Fetch public chats on component mount
+     useEffect(() => {
+        const fetchPublicChats = async () => {
+            try {
+                // Adjust the endpoint according to your backend API
+                const response = await fetch(`http://localhost:8081/GetAllGroupChatsInfo?resultsPerPage=10&page=1`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setPublicChats(data); // Set the fetched data to state
+                } else {
+                    console.error('Failed to fetch public chats');
+                }
+            } catch (error) {
+                console.error('Error fetching public chats:', error);
+            }
+        };
+
+        fetchPublicChats();
+    }, []);
+
+    
 
     const handleCreateGroup = (e) => {
         e.preventDefault()
         console.log('Creating new group:', newGroupName)
+        const createdChat = { id: 7, name: newGroupName, members: 1280 }
         // Here you would typically handle the group creation logic
-        setNewGroupName('')
-    }
+        if (newGroupName){
+            setNewGroupName('')
+            navigate('/chat', { state: { createdChat } }); // Pass the full chat object in the state
+        }
+    } 
+
+    const handleJoinChat = (joinedChat) => {
+        console.log(`Joining the joinedChat: ${joinedChat.groupName}`);
+        // Navigate to the /joinedChat page with the full joinedChat object as state
+        console.log("test", joinedChat)
+        navigate('/chat', { state: { joinedChat } });  // Pass the full chat object in the state
+    };
 
     return (
         <div className="min-h-screen bg-[#000080] text-white p-6">
@@ -63,8 +100,9 @@ export default function GroupChatsPage() {
                     <div className="space-y-2"> {/* Reduced space-y for closer items */}
                         {publicChats.map((chat) => (
                             <div key={chat.id} className="flex items-center justify-between p-4 bg-[#0000E0] rounded-lg mb-2">
-                                <h3 className="font-semibold text-[#FFDD00]">{chat.name}</h3>
-                                <button className="bg-[#FFB300] text-[#000080] px-4 py-2 rounded-lg flex items-center">
+                                <h3 className="font-semibold text-[#FFDD00]">{chat.groupName}</h3>
+                                <button className="bg-[#FFB300] text-[#000080] px-4 py-2 rounded-lg flex items-center"
+                                 onClick={() => handleJoinChat(chat)}>
                                     <UserPlus className="w-4 h-4 mr-2" />
                                     Join
                                 </button>
