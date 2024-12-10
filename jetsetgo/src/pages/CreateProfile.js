@@ -439,7 +439,7 @@ export default function CreateProfile() {
           email: formData.email,
         }),
       });
-
+      console.log(userResponse);
       if (!userResponse.ok) {
         const errorMsg = await userResponse.text();
         throw new Error(`Failed to create user: ${errorMsg}`);
