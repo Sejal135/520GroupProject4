@@ -46,12 +46,15 @@ We aim to have 5 main features in our application as listed below:
 
 
    ## Tech Stack:
+   <img width="769" alt="Screenshot 2024-12-10 at 9 02 18 PM" src="https://github.com/user-attachments/assets/f6ec5ae5-87fa-4e7f-98fd-d7c3e3aa66d4">
    
    ## API Documentation:
+   View here: https://docs.google.com/document/d/1LLIWDP5s1EmTmkEg3Y5JPKoTGApa3UXphFSGHcDCjoc/edit?usp=sharing
 
    ## Backend Testing:
    
    ## Frontend Testing:
+   Given the project's timeline, our team prioritized core functionality over automated testing to ensure the application met its key deliverables.
 
    ### Sign In:
    ![image](https://github.com/user-attachments/assets/94f2b37d-0f10-44d8-b0f7-ecfaf483a2b3)
@@ -76,6 +79,17 @@ We aim to have 5 main features in our application as listed below:
   ![image](https://github.com/user-attachments/assets/ce88d158-909b-41ea-94db-51974a0ea98a)
 
   ### Profile:
+  Similar to other social media platforms, users will have their own profile.
+  Profiles will include the following information/statistics:
+  * Name
+  * User’s Profile Picture
+  * User Bio
+  * Follower Count
+  * Number of Reviews Made
+  * Travel Preferences
+  <img width="1391" alt="Screenshot 2024-12-10 at 9 10 53 PM" src="https://github.com/user-attachments/assets/9c207034-3f27-4600-bdfc-a1d5cf4be9ab">
+
+  
 
   
   ### Edit Profile:
@@ -85,6 +99,64 @@ We aim to have 5 main features in our application as listed below:
    ![image](https://github.com/user-attachments/assets/d680d4ea-ad63-45c2-bb73-14b02caf53a6)
 
 
+## Installation Instructions
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/Sejal135/520GroupProject4.git
+   ```
 
+2. **Navigate to the Project Directory:**
+   ```bash
+   cd jetsetgo
+   ```
 
+3. **Install Dependencies:**
+   - For the backend:
+     ```bash
+     cd backend
+     mvn clean install
+     ```
+   - For the frontend:
+     ```bash
+     cd frontend
+     npm install
+     ```
 
+4. **Start the Application:**
+   - Start the backend server:
+     ```bash
+     mvn spring-boot:run
+     ```
+   - Start the frontend development server:
+     ```bash
+     npm start
+     ```
+
+## Configuration
+### Backend Configuration:
+
+### Frontend Configuration:
+1. **Environment Variables:**
+   - Create a `.env` file in the `frontend` directory.
+   - Add the following variables:
+     ```env
+     PORT=8080
+     ```
+
+---
+
+### Example Run:
+To run the entire project:
+1. Start the backend server in one terminal:
+   ```bash
+   cd backend
+   mvn spring-boot:run
+   ```
+
+2. Start the frontend in another terminal:
+   ```bash
+   cd frontend
+   npm start
+   ```
+
+Visit `http://localhost:8080` to access the application.
