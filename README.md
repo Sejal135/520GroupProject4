@@ -52,6 +52,8 @@ We aim to have 5 main features in our application as listed below:
    View here: https://docs.google.com/document/d/1LLIWDP5s1EmTmkEg3Y5JPKoTGApa3UXphFSGHcDCjoc/edit?usp=sharing
 
    ## Backend Testing:
+
+   JUnit test were written to test all database operations in our codebase. H2 was used to serve as an in-memory database in the testing environment.
    
    ## Frontend Testing:
    Given the project's timeline, our team prioritized core functionality over automated testing to ensure the application met its key deliverables.
@@ -134,6 +136,8 @@ We aim to have 5 main features in our application as listed below:
 
 ## Configuration
 ### Backend Configuration:
+1. **Environment Variables**
+  - Add `TRAVEL_APP_DATABASE_CONNECTION_STRING` to the environment variables on your system. This should take the place of a connection string to a PostgreSQL database.
 
 ### Frontend Configuration:
 1. **Environment Variables:**
