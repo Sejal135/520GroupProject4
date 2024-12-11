@@ -33,6 +33,9 @@ public class GroupChatInfoService {
     @Autowired
     private GroupChatRepository groupChatRepository;
 
+    // Note, this functionality was originally made with the intention of having a user be able to join a
+    // specific group chat and not a chat room. As a result, the implemented back-end functionality is not tested
+    // for this endpoint.
     @Transactional
     public List<GroupChats> findGroupChatsWithHqlQuery(int resultsPerPage, int page) {
 
@@ -42,6 +45,9 @@ public class GroupChatInfoService {
         return entityManager.createQuery(hql, GroupChats.class).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
+    // Note, this functionality was originally made with the intention of having a user be able to join a
+    // specific group chat and not a chat room. As a result, the implemented back-end functionality is not tested
+    // for this endpoint.
     @Transactional
     public List<GroupChats> findGroupChatsForUser(int userId, int resultsPerPage, int page) {
 
@@ -56,6 +62,9 @@ public class GroupChatInfoService {
         return entityManager.createQuery(hql, GroupChats.class).setParameter("userId", userId).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
+    // Note, this functionality was originally made with the intention of having a user be able to join a
+    // specific group chat and not a chat room. As a result, the implemented back-end functionality is not tested
+    // for this endpoint.
     @Transactional
     public String AddUserToGroupChat(int userId, int groupChatId) {
         Users user = usersRepository.findByUserId(userId);
@@ -78,6 +87,7 @@ public class GroupChatInfoService {
 
         return "Successfully added user to group chat";
     }
+
 
     @Transactional
     public String CreateGroupChat(int userId, String groupName) {

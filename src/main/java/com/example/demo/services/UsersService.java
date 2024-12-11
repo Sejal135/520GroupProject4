@@ -72,9 +72,12 @@ public class UsersService {
             preferencesRepository.deleteById(preferece.getPreferenceId());
         }
 
+
         for (Preferences preference : preferencesList) {
-            preference.setUserId(user);
-            preferencesRepository.save(preference);
+            Preferences newPreferences = new Preferences();
+            newPreferences.setPreference(preference.getPreference());
+            newPreferences.setUserId(user);
+            preferencesRepository.save(newPreferences);
         }
 
         return "successfully edited preference list";

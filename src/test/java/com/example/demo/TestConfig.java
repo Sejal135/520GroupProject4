@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.models.repositories.GroupChatRepository;
 import com.example.demo.services.*;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -30,5 +31,15 @@ public class TestConfig {
     @Bean
     public ReviewsService reviewsService() {
         return new ReviewsService();
+    }
+
+    @Bean
+    public GroupChatInfoService groupChatInfoService() {
+        return new GroupChatInfoService();
+    }
+
+    @Bean
+    public PlusOneService plusOneService() {
+        return new PlusOneService();
     }
 }
