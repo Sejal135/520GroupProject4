@@ -63,7 +63,7 @@ This document outlines the contributions made by each team member during the dev
      - Assisted in setting up the initial frontend environment (create react project) and configuring necessary build tools.
      - Created wireframes and mockups for the application’s key pages.
    - **Integration of Backend and Frontend:**
-     - Contributed to minor backend and frontend integration functionality within the UI (namely, .
+     - Contributed to minor backend and frontend integration functionality within the UI.
 
 ---
 
