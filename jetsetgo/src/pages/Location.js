@@ -37,9 +37,15 @@ const Review = ({
 
 // Main LocationPage component for displaying location details and reviews
 function LocationPage({
+<<<<<<< Updated upstream
   query = "Amherst House of Pizza",  // Default search query for location
   selectedPlaceId = 1,              // Default selected place ID
   userId = 1,                       // Default user ID
+=======
+  query = "Amherst House of Pizza",
+  selectedPlaceId = 4,
+  userId = 40,
+>>>>>>> Stashed changes
 }) {
   const [locations, setLocations] = useState([]);    // State for storing locations
   const [reviews, setReviews] = useState([]);        // State for storing reviews

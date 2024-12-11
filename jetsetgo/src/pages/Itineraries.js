@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState } from 'react'
 import { Calendar, Clock, MapPin, Plus, ChevronDown, ChevronUp, Edit2, Trash2 } from 'lucide-react'
 
@@ -6,6 +7,14 @@ const ItineraryItem = ({ day, activities, isOpen, onToggle, onEdit, onDelete }) 
   <div className="bg-[#001530] rounded-lg overflow-hidden mb-4">
     {/* Header section with day number and toggle button for showing/hiding activities */}
     <div 
+=======
+import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode"; // Correct import for jwtDecode
+import { Calendar, Clock, MapPin, Plus, ChevronDown, ChevronUp, Edit2, Trash2 } from "lucide-react";
+const ItineraryItem = ({ day, activities, isOpen, onToggle, onEdit, onDelete }) => (
+  <div className="bg-[#001530] rounded-lg overflow-hidden mb-4">
+    <div
+>>>>>>> Stashed changes
       className="flex justify-between items-center p-4 cursor-pointer"
       onClick={onToggle} // Toggles visibility of the day's activities
     >
@@ -40,17 +49,15 @@ const ItineraryItem = ({ day, activities, isOpen, onToggle, onEdit, onDelete }) 
             <div className="flex items-center mt-2 text-sm text-[#FFDD00]/60">
               <Clock className="w-4 h-4 mr-1" />
               <span>{activity.time}</span>
-              <MapPin className="w-4 h-4 ml-4 mr-1" />
-              <span>{activity.location}</span>
             </div>
           </div>
         ))}
       </div>
     )}
   </div>
-)
-
+);
 export default function Itineraries() {
+<<<<<<< Updated upstream
   // State to track the active itinerary and the open days for each itinerary
   const [activeItinerary, setActiveItinerary] = useState(0)
   const [openDays, setOpenDays] = useState([1])
@@ -102,17 +109,78 @@ export default function Itineraries() {
   }
 
   // Placeholder functions for editing and deleting activities
+=======
+  const [activeItinerary, setActiveItinerary] = useState(0);
+  const [openDays, setOpenDays] = useState([1]);
+  const [itineraries, setItineraries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchItineraries = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) throw new Error("User not authenticated");
+        const decodedToken = jwtDecode(token);
+        const email = decodedToken.email;
+        const profileResponse = await fetch(`http://localhost:8081/GetUserProfileByEmail?email=${email}`);
+        if (!profileResponse.ok) throw new Error("Failed to fetch profile data");
+        const profileJson = await profileResponse.json();
+        const userId = profileJson.userId;
+        const itineraryResponse = await fetch(`http://localhost:8081/GetItinerariesForUser?userId=${userId}`);
+        const itinerariesData = await itineraryResponse.json();
+        const itinerariesWithDetails = await Promise.all(
+          itinerariesData.map(async (itinerary) => {
+            const itemsData = itinerary.map((item) => ({
+              name: item.itineraryItemHeader,
+              description: item.itineraryItemDescription,
+              time: new Date(item.timeItemAt).toLocaleTimeString(),
+              location: item.itineraryItemLocation || "",
+              parentItinerary: {
+                itineraryId: item.itineraryReferenceId,
+                itineraryName: item.parentItineraryName || "Unnamed Itinerary", // Adjusted to include parent itinerary name
+              },
+              timeItemAt: item.timeItemAt,
+            }));
+            const days = itemsData.reduce((acc, item) => {
+              const dayNumber = Math.ceil(
+                (new Date(item.timeItemAt) - new Date(itinerary.itineraryTimestamp)) / (1000 * 60 * 60 * 24)
+              );
+              acc[dayNumber] = acc[dayNumber] || [];
+              acc[dayNumber].push(item);
+              return acc;
+            }, {});
+            return {
+              ...itinerary,
+              days: Object.keys(days).map((day) => ({
+                day: parseInt(day),
+                activities: days[day],
+              })),
+            };
+          })
+        );
+        setItineraries(itinerariesWithDetails);
+      } catch (error) {
+        console.error("Error fetching itineraries:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchItineraries();
+  }, []);
+  const toggleDay = (day) => {
+    setOpenDays((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]));
+  };
+>>>>>>> Stashed changes
   const handleEdit = (day, activityIndex) => {
-    console.log(`Edit activity ${activityIndex} on day ${day}`)
-    // Implement edit functionality here
-  }
-
+    console.log(`Edit activity ${activityIndex} on day ${day}`);
+  };
   const handleDelete = (day, activityIndex) => {
-    console.log(`Delete activity ${activityIndex} on day ${day}`)
-    // Implement delete functionality here
-  }
+    console.log(`Delete activity ${activityIndex} on day ${day}`);
+  };
+  if (loading) return <div>Loading itineraries...</div>;
 
+  
   return (
+<<<<<<< Updated upstream
     <div className="min-h-screen bg-[#000080] text-white">
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
@@ -159,12 +227,44 @@ export default function Itineraries() {
                   onToggle={() => toggleDay(day.day)} // Toggle function for day visibility
                   onEdit={handleEdit} // Edit handler function
                   onDelete={handleDelete} // Delete handler function
+=======
+    <div className="min-h-screen bg-[#000080] text-white p-6">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold text-[#FFDD00] mb-6">Your Itineraries</h1>
+        {itineraries.length === 0 ? (
+          <p className="text-center text-gray-400">No itineraries found. Start planning your journey!</p>
+        ) : (
+          itineraries.map((itinerary, index) => (
+            <div key={index} className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#FFDD00] mb-4">
+                {itinerary.itineraryName || "Unnamed Itinerary"}
+              </h2>
+              <p className="text-sm text-gray-400 mb-4">
+                Created on:{" "}
+                {new Date(itinerary.itineraryTimestamp).toLocaleDateString()}
+              </p>
+              {itinerary.days.map(({ day, activities }) => (
+                <ItineraryItem
+                  key={day}
+                  day={day}
+                  activities={activities.map((activity) => ({
+                    name: activity.name,
+                    description: activity.description,
+                    time: activity.time,
+                    location: activity.location,
+                  }))}
+                  isOpen={openDays.includes(day)}
+                  onToggle={() => toggleDay(day)}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+>>>>>>> Stashed changes
                 />
               ))}
             </div>
-          </div>
-        </div>
+          ))
+        )}
       </div>
     </div>
-  )
+  );
+  
 }
