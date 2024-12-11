@@ -37,15 +37,9 @@
 
 // // Main LocationPage component for displaying location details and reviews
 // function LocationPage({
-// <<<<<<< Updated upstream
-//   query = "Amherst House of Pizza",  // Default search query for location
-//   selectedPlaceId = 1,              // Default selected place ID
-//   userId = 1,                       // Default user ID
-// =======
 //   query = "Amherst House of Pizza",
 //   selectedPlaceId = 4,
 //   userId = 40,
-// >>>>>>> Stashed changes
 // }) {
 //   const [locations, setLocations] = useState([]);    // State for storing locations
 //   const [reviews, setReviews] = useState([]);        // State for storing reviews
@@ -221,195 +215,6 @@
 
 
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
-
-// Review component for displaying individual reviews
-const Review = ({
-  title,
-  reviewerName,
-  reviewText,
-  plusOneCount,
-  profilePic,
-  reviewId,
-  userId,
-  handlePlusOne,
-}) => (
-  <div className="bg-[#001530] p-4 rounded-lg mb-4">
-    <div className="flex items-center gap-3 mb-4">
-      <img
-        src={profilePic || "/default-avatar.png"}
-        alt={reviewerName}
-        className="w-10 h-10 rounded-full"
-      />
-      <div>
-        <h3 className="font-semibold text-[#FFDD00]">{reviewerName}</h3>
-      </div>
-    </div>
-    <h4 className="text-lg font-bold text-[#FFB300] mb-2">{title}</h4>
-    <p className="text-white mb-4">{reviewText}</p>
-    <div className="flex items-center gap-4 text-[#FFDD00]">
-      <button
-        className="flex items-center gap-1 hover:text-[#FFB300]"
-        onClick={() => handlePlusOne(reviewId, userId)}
-      >
-        +1 ({plusOneCount})
-      </button>
-    </div>
-  </div>
-);
-
-// Main LocationPage component
-// function LocationPage() {
-//   const { placeId } = useParams(); // Extract placeId from URL
-//   const location = useLocation();
-//   const placeName = location.state?.placeName || "Location";
-
-//   const [reviews, setReviews] = useState([]);
-//   const [newTitle, setNewTitle] = useState("");
-//   const [newComment, setNewComment] = useState("");
-//   const [message, setMessage] = useState("");
-
-//   useEffect(() => {
-//     const fetchReviews = async () => {
-//       try {
-//         const response = await fetch(
-//           `http://localhost:8081/GetAllReviewsForAPlace?placeId=${placeId}&resultsPerPage=5&page=1&datePosted=2024-12-10T18:22:57.000-00:00`
-//         );
-//         if (response.ok) {
-//           const data = await response.json();
-//           setReviews(data);
-//         } else {
-//           console.error("Failed to fetch reviews");
-//         }
-//       } catch (error) {
-//         console.error("Error fetching reviews:", error);
-//       }
-//     };
-
-//     fetchReviews();
-//   }, [placeId]);
-
-//   const handleSubmitComment = async (e) => {
-//     e.preventDefault();
-
-//     if (!newTitle.trim() || !newComment.trim()) {
-//       setMessage("Title and comment are required.");
-//       return;
-//     }
-
-//     try {
-//       const response = await fetch(
-//         `http://localhost:8081/AddReviewToDatabase?title=${encodeURIComponent(
-//           newTitle
-//         )}&userId=1&placeId=${placeId}&reviewContents=${encodeURIComponent(
-//           newComment
-//         )}`,
-//         { method: "POST" }
-//       );
-
-//       if (response.ok) {
-//         setMessage("Review Submitted");
-//         setNewTitle("");
-//         setNewComment("");
-//       } else {
-//         const errorData = await response.json();
-//         console.error("Failed to add review:", errorData);
-//         setMessage("Failed to submit the review.");
-//       }
-//     } catch (error) {
-//       console.error("Error adding review:", error);
-//       setMessage("An error occurred while submitting the review.");
-//     }
-//   };
-
-//   const handlePlusOne = async (reviewId, userId) => {
-//     try {
-//       const response = await fetch(
-//         `http://localhost:8081/IncrementPlusOne?reviewId=${reviewId}&userId=${userId}`
-//       );
-//       if (response.ok) {
-//         const updatedCount = await response.json();
-//         setReviews((prevReviews) =>
-//           prevReviews.map((review) =>
-//             review.reviewId === reviewId
-//               ? { ...review, plusOneCount: updatedCount }
-//               : review
-//           )
-//         );
-//       } else {
-//         console.error("Failed to increment +1");
-//       }
-//     } catch (error) {
-//       console.error("Error incrementing +1:", error);
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-[#000080] text-white p-6">
-//       <div className="max-w-4xl mx-auto">
-//         <h1 className="text-4xl font-bold text-[#FFDD00] mb-4">{placeName}</h1>
-
-//         <div className="mb-8">
-//           <h2 className="text-2xl font-semibold text-[#FFDD00] mb-4">
-//             Write a Review
-//           </h2>
-//           <form onSubmit={handleSubmitComment} className="space-y-4">
-//             <input
-//               type="text"
-//               value={newTitle}
-//               onChange={(e) => setNewTitle(e.target.value)}
-//               placeholder="Title of your review"
-//               className="w-full p-3 rounded-lg bg-[#001530] text-white border border-[#FFDD00] focus:outline-none focus:border-[#FFB300]"
-//             />
-//             <textarea
-//               value={newComment}
-//               onChange={(e) => setNewComment(e.target.value)}
-//               placeholder="Share your experience..."
-//               className="w-full p-3 rounded-lg bg-[#001530] text-white border border-[#FFDD00] focus:outline-none focus:border-[#FFB300]"
-//               rows="4"
-//             />
-//             <button
-//               type="submit"
-//               className="bg-[#FFB300] text-[#000080] px-6 py-2 rounded-lg hover:bg-[#FFDD00]"
-//             >
-//               Submit Review
-//             </button>
-//           </form>
-//           {message && <p className="text-center mt-4">{message}</p>}
-//         </div>
-
-//         <div>
-//           <h2 className="text-2xl font-semibold text-[#FFDD00] mb-4">
-//             User Reviews
-//           </h2>
-//           {reviews.length === 0 ? (
-//             <p className="text-center text-gray-500">
-//               No reviews found for this location.
-//             </p>
-//           ) : (
-//             reviews.map((review) => (
-//               <Review
-//                 key={review.reviewId}
-//                 title={review.title}
-//                 reviewerName={review.reviewerId.username}
-//                 reviewText={review.review}
-//                 plusOneCount={review.plusOneCount}
-//                 profilePic={review.reviewerId.profilePic}
-//                 reviewId={review.reviewId}
-//                 userId={1}
-//                 handlePlusOne={handlePlusOne}
-//               />
-//             ))
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default LocationPage;
-
-import React, { useState, useEffect } from "react";
 
 // Review component for displaying individual reviews
 const Review = ({
@@ -449,8 +254,8 @@ const Review = ({
 // Main LocationPage component for displaying location details and reviews
 function LocationPage({
   query = "Amherst House of Pizza",
-  selectedPlaceId = 4,
-  userId = 40,
+  selectedPlaceId = 1,
+  userId = 49,
 }) {
   const [locations, setLocations] = useState([]);    // State for storing locations
   const [reviews, setReviews] = useState([]);        // State for storing reviews
