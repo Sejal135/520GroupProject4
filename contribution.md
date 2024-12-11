@@ -12,6 +12,7 @@ This document outlines the contributions made by each team member during the dev
      - Encouraged team communication and completion of project milestones.
    - **Backend Development:**
      - Aided Ruth in the implementation and backend integration of User Authentication with Google OAuth.
+     - Aided Sejal in the implementation of Itinerary Page by providing a template for fetching itinerary information from backend.
      - Integrated the Travel Group Chat feature, including messaging and location sharing functionalities.
        - Aided Rubens in utilizing WebSocket services to enable backend and frontend communication.
    - **Frontend Development:**
@@ -60,10 +61,14 @@ This document outlines the contributions made by each team member during the dev
 
 ### 5. **Sejal Agrawal**
    - **Frontend Development:**
-     - Assisted in setting up the initial frontend environment (create react project) and configuring necessary build tools.
-     - Created wireframes and mockups for the application’s key pages.
+     - Assisted in setting up the initial frontend environment and configuring necessary build tools.
+     - Created wireframes and mockups for the application’s key pages using Figma.
+     - Implemented 4 Frontend pages which were re-worked on by Ruth B. to ensure consistent design and flow cohesively with the entire web application. 
    - **Integration of Backend and Frontend:**
-     - Contributed to minor backend and frontend integration functionality within the UI.
+     - Contributed to backend and frontend integration functionality within the UI.
+     - Implemented the location page integration of backend and frontend.
+     - Implemented the itinerary page integration of backend and frontend.
+     - Cleaned up basic miscellaneous code in Location and Itinerary Page.
 
 ---
 
@@ -74,6 +79,8 @@ This document outlines the contributions made by each team member during the dev
   - Saved Destinations Feature [Ruth]
   - Travel Group Chat [Ruth and Aman]
   - Navigation between Pages (Profile, Reviews, etc.) [Primarily Ruth and Aman]
+  - Itinerary [Sejal and Aman]
+  - Location [Sejal]
   
 - **Backend:** 
   - User Authentication (via Username/Password, Google OAuth) [Ruth and Aman]
@@ -88,3 +95,6 @@ This document outlines the contributions made by each team member during the dev
 
 - **Documentation:** 
   - API documentation [Tristan]
+    
+- **Video Demo:** 
+ - Video Demo presented [Sejal]
