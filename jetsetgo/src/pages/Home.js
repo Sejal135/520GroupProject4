@@ -4,29 +4,37 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 
 export default function Home() {
+  // State to track the active tab (e.g., trending, following, discover)
   const [activeTab, setActiveTab] = useState('trending');
+
+  // State to store the user ID obtained from the user's profile
   const [userId, setUserId] = useState(null);
+
+  // State to store the list of posts fetched from the server
   const [posts, setPosts] = useState([]);
+
+  // Hook to handle navigation between routes
   const navigate = useNavigate();
 
-
+  // Effect to fetch user profile data when the component mounts
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const token = localStorage.getItem('jwtToken');
+        const token = localStorage.getItem('jwtToken'); // Retrieve JWT token from localStorage
         if (token) {
-          // Step 1: Decode token to get email
+          // Decode the JWT token to extract the user's email
           const decodedToken = jwtDecode(token);
           const email = decodedToken.email;
 
-          // Step 2: Fetch user profile by email
+          // Fetch the user profile data based on the extracted email
           const profileResponse = await fetch(`http://localhost:8081/GetUserProfileByEmail?email=${email}`);
           if (!profileResponse.ok) {
             throw new Error('Failed to fetch profile data');
           }
           const profileJson = await profileResponse.json();
           console.log('Fetched profile data:', profileJson);
-          // Set userId
+
+          // Set the user ID in state
           setUserId(profileJson.userId);
         } else {
           console.error('JWT token not found in localStorage.');
@@ -37,19 +45,19 @@ export default function Home() {
     };
 
     fetchProfileData();
-  }, []); // Run once when the component mounts
+  }, []); // Dependency array ensures this runs only once when the component mounts
 
+  // Effect to fetch posts whenever the user ID changes
   useEffect(() => {
     const fetchPosts = async () => {
-      if (!userId) return; // Wait until userId is available
+      if (!userId) return; // Do not fetch posts until the user ID is available
 
       console.log('Fetching posts for userId:', userId);
       const date = new Date();
-      const isoDate = getCustomISODate(date);
+      const isoDate = getCustomISODate(date); // Format the current date for API compatibility
       console.log('Formatted date:', isoDate);
-      console.log(`http://localhost:8081/GetExplorerPageSuggestions?userId=${userId}&page=1&resultsPerPage=10&datePosted=${encodeURIComponent(isoDate)}`);
-      console.log(`http://localhost:8081/GetExplorerPageSuggestions?userId=${userId}&page=1&resultsPerPage=10&datePosted=${isoDate}`);
       try {
+        // Fetch posts for the user ID and date
         const response = await fetch(
           `http://localhost:8081/GetExplorerPageSuggestions?userId=${userId}&page=1&resultsPerPage=10&datePosted=${encodeURIComponent(isoDate)}`
         );
@@ -60,26 +68,29 @@ export default function Home() {
 
         const data = await response.json();
         console.log('Fetched posts:', data);
-        setPosts(data.posts || []); // Adjust if the API returns a different structure
+
+        // Update the posts state with the fetched data
+        setPosts(data.posts || []); // Fallback to an empty array if no posts are found
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
     };
 
     fetchPosts();
-  }, [userId]); // Runs when userId is updated
+  }, [userId]); // Dependency array ensures this runs whenever the user ID changes
 
-
+  // JSX to render the component
   return (
     <div className="min-h-screen bg-[#000080] text-white">
       <div className="container mx-auto px-4 py-8">
-        {/* Page Header */}
+        {/* Page Header with title and navigation buttons */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">Explore</h1>
             <p className="text-[#FFDD00]">Discover amazing destinations and travel stories</p>
           </div>
           <div className="flex gap-2">
+            {/* Navigation buttons to switch tabs */}
             <button 
               onClick={() => setActiveTab('trending')}
               className={`flex items-center gap-2 px-4 py-2 rounded-md ${
@@ -134,11 +145,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Feed Posts */}
+        {/* Feed Posts Section */}
         <div className="space-y-8">
           {posts.map(post => (
             <div key={post.id} className="bg-[#001530] rounded-xl overflow-hidden">
-              {/* Post Header */}
+              {/* Post Header with user info and share button */}
               <div className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <img
@@ -147,12 +158,12 @@ export default function Home() {
                     className="w-10 h-10 rounded-full"
                   />
                   <div>
-                  <h3
-                    className="font-semibold cursor-pointer text-[#FFDD00] hover:text-[#FFB300]"
-                    onClick={() => navigate(`/profile/${post.user.name}`)}
-                  >
-                    {post.user.name}
-                  </h3>
+                    <h3
+                      className="font-semibold cursor-pointer text-[#FFDD00] hover:text-[#FFB300]"
+                      onClick={() => navigate(`/profile/${post.user.name}`)}
+                    >
+                      {post.user.name}
+                    </h3>
                     <div className="flex items-center text-sm text-[#FFDD00]">
                       <MapPin className="w-4 h-4 mr-1" />
                       {post.user.location}
@@ -171,7 +182,7 @@ export default function Home() {
                 className="w-full h-96 object-cover"
               />
 
-              {/* Post Content */}
+              {/* Post Content including title, description, tags, likes, and comments */}
               <div className="p-4">
                 <h2 className="text-xl font-bold mb-2">{post.title}</h2>
                 <p className="text-[#FFDD00] mb-4">{post.description}</p>
@@ -203,11 +214,10 @@ export default function Home() {
         </div>
       </div>
     </div>
-  )
-
+  );
 }
 
-// Helper function to format date in correct format for the API
+// Helper function to format date in the correct format for the API
 function getCustomISODate(date) {
   // Get the components of the ISO string without the timezone info
   const isoString = date.toISOString();

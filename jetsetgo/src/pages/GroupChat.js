@@ -86,10 +86,10 @@
 //   )
 // }
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { ArrowLeft } from 'lucide-react'
-import { Client } from '@stomp/stompjs'
-import SockJS from 'sockjs-client'
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import Stomp from '@stomp/stompjs'; // Or your preferred STOMP library
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
@@ -103,16 +103,17 @@ const Message = ({ sender, content, timestamp, isMine }) => (
       <p className={`text-xs ${isMine ? 'text-[#000080]/70' : 'text-[#FFDD00]/70'} text-right mt-1`}>{timestamp}</p>
     </div>
   </div>
-)
+);
+
 export default function GroupChat() {
-  const [messages, setMessages] = useState([])
-  const [newMessage, setNewMessage] = useState('')
-  const [username, setUsername] = useState('')
-  const [roomCode, setRoomCode] = useState('')
-  const [isConnected, setIsConnected] = useState(false)
-  const [connectionError, setConnectionError] = useState('')
-  const messagesEndRef = useRef(null)
-  const stompClientRef = useRef(null)
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [username, setUsername] = useState('');
+  const [roomCode, setRoomCode] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionError, setConnectionError] = useState('');
+  const messagesEndRef = useRef(null);
+  const stompClientRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -124,20 +125,14 @@ export default function GroupChat() {
       try {
         const token = localStorage.getItem('jwtToken');
         if (token) {
-
-          // Step 1 
           const decodedToken = jwtDecode(token);
           const email = decodedToken.email;
 
-          // Step 2 
-          // Fetch user profile by email
           const profileResponse = await fetch(`http://localhost:8081/GetUserProfileByEmail?email=${email}`);
           if (!profileResponse.ok) {
             throw new Error('Failed to fetch profile data');
           }
           const profileJson = await profileResponse.json();
-
-          // Update the state with fetched data
           setUsername(profileJson.username);
         } else {
           console.error('JWT token not found in localStorage.');
@@ -152,68 +147,67 @@ export default function GroupChat() {
     fetchProfileData();
   }, []);
 
-  console.log("username!", username)
+  console.log("username!", username);
 
   useEffect(() => {
     if (joinedChat) {
-        // Set roomCode to the joinedChat's name and username to "exampleUser"
-        setRoomCode(joinedChat.groupName); // Set roomCode to joinedChat.name
-       // setUsername('exampleUser'); // Set username to "exampleUser"
+      setRoomCode(joinedChat.groupName); // Set roomCode to joinedChat.name
     } 
     if (createdChat) {
-      // Set roomCode to the joinedChat's name and username to "exampleUser"
-      setRoomCode(createdChat.name); // Set roomCode to joinedChat.name
-     // setUsername('chatCreator'); // Set username to "exampleUser"
-  }
-}, [joinedChat, createdChat]); // Dependency array ensures it runs when chat is updated
-
+      setRoomCode(createdChat.name); // Set roomCode to createdChat.name
+    }
+  }, [joinedChat, createdChat]); 
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const connectToWebSocket = useCallback(() => {
     if (isConnected && username && roomCode) {
-      const socket = new SockJS('http://localhost:8081/ws')
+      const socket = new SockJS('http://localhost:8081/ws');
       const client = new Client({
         webSocketFactory: () => socket,
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
         onConnect: () => {
-          console.log('Connected to WebSocket')
-          client.subscribe(`/topic/${roomCode}`, onMessageReceived)
-          sendJoinMessage(client)
-          setConnectionError('')
+          console.log('Connected to WebSocket');
+          client.subscribe(`/topic/${roomCode}`, onMessageReceived);
+          sendJoinMessage(client);
+          setConnectionError('');
         },
         onStompError: (frame) => {
-          console.error('STOMP error', frame)
-          setConnectionError('Failed to connect to the chat server. Retrying...')
+          console.error('STOMP error', frame);
+          setConnectionError('Failed to connect to the chat server. Retrying...');
         },
         onWebSocketClose: () => {
-          console.log('WebSocket connection closed')
-          setConnectionError('Connection lost. Attempting to reconnect...')
+          console.log('WebSocket connection closed');
+          setConnectionError('Connection lost. Attempting to reconnect...');
         },
-      })
-      stompClientRef.current = client
-      client.activate()
+      });
+      stompClientRef.current = client;
+      client.activate();
       return () => {
         if (client.active) {
-          sendLeaveMessage(client)
-          client.deactivate()
+          sendLeaveMessage(client);
+          client.deactivate();
         }
-      }
+      };
     }
-  }, [isConnected, username, roomCode])
+  }, [isConnected, username, roomCode]);
+
   useEffect(() => {
-    const cleanup = connectToWebSocket()
+    const cleanup = connectToWebSocket();
     return () => {
-      if (cleanup) cleanup()
-    }
-  }, [connectToWebSocket])
+      if (cleanup) cleanup();
+    };
+  }, [connectToWebSocket]);
+
   const onMessageReceived = (message) => {
-    const receivedMessage = JSON.parse(message.body)
-    setMessages((prevMessages) => [...prevMessages, receivedMessage])
-  }
+    const receivedMessage = JSON.parse(message.body);
+    setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+  };
+
   const sendJoinMessage = (client) => {
     if (client && client.active) {
       const joinMessage = {
@@ -222,13 +216,14 @@ export default function GroupChat() {
         content: `${username} joined!`,
         type: 'JOIN',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      }
+      };
       client.publish({
         destination: `/app/chat.addUser/${roomCode}`,
         body: JSON.stringify(joinMessage),
-      })
+      });
     }
-  }
+  };
+
   const sendLeaveMessage = (client) => {
     if (client && client.active) {
       const leaveMessage = {
@@ -237,22 +232,24 @@ export default function GroupChat() {
         content: `${username} left!`,
         type: 'LEAVE',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      }
+      };
       client.publish({
         destination: `/app/chat.addUser/${roomCode}`,
         body: JSON.stringify(leaveMessage),
-      })
+      });
     }
-  }
+  };
+
   const handleConnect = (e) => {
-    e?.preventDefault()
+    e?.preventDefault();
     if (username && roomCode) {
-      setConnectionError('')
-      setIsConnected(true)
+      setConnectionError('');
+      setIsConnected(true);
     }
-  }
+  };
+
   const handleSendMessage = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (newMessage.trim() && stompClientRef.current && stompClientRef.current.active) {
       const chatMessage = {
         roomId: 'public',
@@ -260,37 +257,38 @@ export default function GroupChat() {
         content: newMessage,
         type: 'CHAT',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      }
+      };
       stompClientRef.current.publish({
         destination: `/app/chat.sendMessage/${roomCode}`,
         body: JSON.stringify(chatMessage),
-      })
-      setNewMessage('')
+      });
+      setNewMessage('');
     } else if (!stompClientRef.current || !stompClientRef.current.active) {
-      setConnectionError('Connection lost. Please wait while we reconnect...')
-      connectToWebSocket()
+      setConnectionError('Connection lost. Please wait while we reconnect...');
+      connectToWebSocket();
     }
-  }
+  };
+
   const handleDisconnect = () => {
     if (stompClientRef.current && stompClientRef.current.active) {
-      sendLeaveMessage(stompClientRef.current)
-      stompClientRef.current.deactivate()
+      sendLeaveMessage(stompClientRef.current);
+      stompClientRef.current.deactivate();
     }
-    setIsConnected(false)
-    setMessages([])
-    setConnectionError('')
-    navigate('../group-chats')
-  }
+    setIsConnected(false);
+    setMessages([]);
+    setConnectionError('');
+    navigate('../group-chats');
+  };
 
   useEffect(() => {
     if (username) {
-        handleConnect(); // Call handleConnect after setting the username
+      handleConnect(); // Call handleConnect after setting the username
     }
-}, [username]); //
+  }, [username]); 
 
-if (isLoading) {
-  return <div className="min-h-screen bg-navy-blue text-white text-center py-20">Loading...</div>;
-}
+  if (isLoading) {
+    return <div className="min-h-screen bg-navy-blue text-white text-center py-20">Loading...</div>;
+  }
 
   if (!isConnected) {
     return (
@@ -317,8 +315,9 @@ if (isLoading) {
           </button>
         </form>
       </div>
-    )
+    );
   }
+
   return (
     <div className="min-h-screen bg-[#000080] text-white flex">
       <div className="flex-grow flex flex-col h-screen">
@@ -330,31 +329,30 @@ if (isLoading) {
         </div>
         <div className="flex-grow overflow-y-auto p-4 space-y-4">
           {connectionError && <p className="text-red-500 mb-4">{connectionError}</p>}
-          {messages.map((message, index) => (
+          {messages.map((msg, index) => (
             <Message
               key={index}
-              sender={message.sender}
-              content={message.content}
-              timestamp={message.timestamp}
-              isMine={message.sender === username}
+              sender={msg.sender}
+              content={msg.content}
+              timestamp={msg.timestamp}
+              isMine={msg.sender === username}
             />
           ))}
           <div ref={messagesEndRef} />
         </div>
-        <form onSubmit={handleSendMessage} className="bg-[#001530] p-4 flex items-center">
-          <input
-            type="text"
+        <form onSubmit={handleSendMessage} className="bg-[#001530] p-4">
+          <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-grow bg-[#000080] text-white rounded-l-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#FFB300]"
+            placeholder="Type a message"
+            rows="3"
+            className="w-full p-2 mb-4 bg-[#000080] text-white rounded"
           />
-          <button type="submit" className="bg-[#FFB300] text-[#000080] rounded-r-full px-4 py-2 hover:bg-[#FFDD00]">
+          <button type="submit" className="w-full bg-[#FFB300] text-[#000080] p-2 rounded hover:bg-[#FFDD00]">
             Send
           </button>
         </form>
       </div>
     </div>
-  )
+  );
 }
-

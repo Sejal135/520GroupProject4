@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from "react";
 
+// Review component for displaying individual reviews
 const Review = ({
-  title,
-  reviewerName,
-  reviewText,
-  plusOneCount,
-  profilePic,
-  reviewId,
-  userId,
-  handlePlusOne,
+  title,             // Title of the review
+  reviewerName,      // Name of the reviewer
+  reviewText,        // Text of the review
+  plusOneCount,      // Number of "plus one" votes
+  profilePic,        // URL of the reviewer's profile picture
+  reviewId,          // Unique ID of the review
+  userId,            // ID of the current user
+  handlePlusOne,     // Function to handle the plus one feature
 }) => (
   <div className="bg-[#001530] p-4 rounded-lg mb-4">
     <div className="flex items-center gap-3 mb-4">
       <img
-        src={profilePic || "/default-avatar.png"}
-        alt={reviewerName}
+        src={profilePic || "/default-avatar.png"} // Default avatar if no profile picture
+        alt={reviewerName} // Alt text for the image
         className="w-10 h-10 rounded-full"
       />
       <div>
@@ -26,7 +27,7 @@ const Review = ({
     <div className="flex items-center gap-4 text-[#FFDD00]">
       <button
         className="flex items-center gap-1 hover:text-[#FFB300]"
-        onClick={() => handlePlusOne(reviewId, userId)}
+        onClick={() => handlePlusOne(reviewId, userId)} // Trigger plus one on click
       >
         +1 ({plusOneCount})
       </button>
@@ -34,18 +35,19 @@ const Review = ({
   </div>
 );
 
+// Main LocationPage component for displaying location details and reviews
 function LocationPage({
-  query = "Amherst House of Pizza",
-  selectedPlaceId = 1,
-  userId = 1,
+  query = "Amherst House of Pizza",  // Default search query for location
+  selectedPlaceId = 1,              // Default selected place ID
+  userId = 1,                       // Default user ID
 }) {
-  const [locations, setLocations] = useState([]);
-  const [reviews, setReviews] = useState([]);
-  const [newTitle, setNewTitle] = useState("");
-  const [newComment, setNewComment] = useState("");
-  const [message, setMessage] = useState("");
+  const [locations, setLocations] = useState([]);    // State for storing locations
+  const [reviews, setReviews] = useState([]);        // State for storing reviews
+  const [newTitle, setNewTitle] = useState("");      // State for the new review title
+  const [newComment, setNewComment] = useState("");  // State for the new review comment
+  const [message, setMessage] = useState("");        // State for feedback message
 
-  // Fetch locations based on the query
+  // Fetch locations based on the search query
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -53,8 +55,8 @@ function LocationPage({
           `http://localhost:8081/GetPlacesByPlacename?placename=${query}&resultsPerPage=5&page=1`
         );
         if (response.ok) {
-          const data = await response.json();
-          setLocations(data);
+          const data = await response.json(); // Parse the response as JSON
+          setLocations(data);                  // Update the locations state
         } else {
           console.error("Failed to fetch locations");
         }
@@ -62,8 +64,8 @@ function LocationPage({
         console.error("Error fetching locations:", error);
       }
     };
-    fetchLocations();
-  }, [query]);
+    fetchLocations(); // Call fetch function on component mount
+  }, [query]); // Dependency array to re-fetch when the query changes
 
   // Fetch reviews for the selected place
   useEffect(() => {
@@ -73,8 +75,8 @@ function LocationPage({
           `http://localhost:8081/GetAllReviewsForAPlace?placeId=${selectedPlaceId}&resultsPerPage=5&page=1&datePosted=2025-12-10T18:22:57.000-00:00`
         );
         if (response.ok) {
-          const data = await response.json();
-          setReviews(data);
+          const data = await response.json(); // Parse the response as JSON
+          setReviews(data);                     // Update the reviews state
         } else {
           console.error("Failed to fetch reviews");
         }
@@ -82,13 +84,14 @@ function LocationPage({
         console.error("Error fetching reviews:", error);
       }
     };
-    fetchReviews();
-  }, [selectedPlaceId]);
+    fetchReviews(); // Call fetch function on component mount or place ID change
+  }, [selectedPlaceId]); // Dependency array to re-fetch when the selected place ID changes
 
   // Handle review submission
   const handleSubmitComment = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
 
+    // Check if both title and comment are provided
     if (!newTitle.trim() || !newComment.trim()) {
       setMessage("Title and comment are required.");
       return;
@@ -105,9 +108,9 @@ function LocationPage({
       );
 
       if (response.ok) {
-        setMessage("Review Submitted");
-        setNewTitle("");
-        setNewComment("");
+        setMessage("Review Submitted"); // Success message
+        setNewTitle("");                // Clear title input
+        setNewComment("");              // Clear comment input
       } else {
         const errorData = await response.json();
         console.error("Failed to add review:", errorData);
@@ -126,11 +129,11 @@ function LocationPage({
         `http://localhost:8081/IncrementPlusOne?reviewId=${reviewId}&userId=${userId}`
       );
       if (response.ok) {
-        const updatedCount = await response.json();
+        const updatedCount = await response.json(); // Get updated count from the server
         setReviews((prevReviews) =>
           prevReviews.map((review) =>
             review.reviewId === reviewId
-              ? { ...review, plusOneCount: updatedCount }
+              ? { ...review, plusOneCount: updatedCount } // Update the plus one count for the review
               : review
           )
         );
@@ -142,7 +145,7 @@ function LocationPage({
     }
   };
 
-  // JSX for the page
+  // JSX for the page layout and rendering reviews
   return (
     <div className="min-h-screen bg-[#000080] text-white p-6">
       <div className="max-w-4xl mx-auto">

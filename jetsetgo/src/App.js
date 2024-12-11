@@ -12,6 +12,7 @@ import GroupChatsPage from "./pages/ViewChats";
 import GroupChat from "./pages/GroupChat";
 import Location from "./pages/Location";
 import EditProfile from "./pages/EditProfile";
+import OtherUserProfile from "./pages/OtherUserProfile";
 
 const Layout = () => {
   const location = useLocation();
@@ -46,6 +47,7 @@ function App() {
           <Route path="/chat" element={<GroupChat />} />
           <Route path="/location" element={<Location />} />
           <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/other-user-profile" element={<OtherUserProfile />} />
         </Route>
       </Routes>
     </Router>
