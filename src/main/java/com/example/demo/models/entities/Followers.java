@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "Followers")
-
+// Creates followers table in the database and serves as an object for the database response to map to
 public class Followers {
 
     @Id

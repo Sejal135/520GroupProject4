@@ -34,12 +34,14 @@ public class ExplorerHomepageService {
 
     public List<Reviews> GetPaginatedFeed(Date datePosted, int page, int resultsPerPage, int userId) {
 
+        // find user to get follower feed for
         Users user = usersRepository.findByUserId(userId);
 
         if (user == null) {
             return new ArrayList<Reviews>();
         }
 
+        // get the users which the user is following
         List<Followers> followersList = usersService.GetFollowedList(userId);
 
         // I really wish I could use C# LINQ here
@@ -50,6 +52,7 @@ public class ExplorerHomepageService {
 
         int skip = resultsPerPage * (page - 1);
 
+        // Gets the resultsPerPage most recent reviews after skip reviews before the provided timestamp
         String hql =
                 "FROM Reviews reviews " +
                         "JOIN Users users on users = reviews.reviewerId " +
@@ -76,6 +79,7 @@ public class ExplorerHomepageService {
 
         int skip = (page - 1) * resultsPerPage;
 
+        // Gets the resultsPerPage most recent reviews after skip from users who share an overlapping travel preference before dateposted.
         String hql =
                 "SELECT DISTINCT reviews " +
                         "FROM Reviews reviews " +

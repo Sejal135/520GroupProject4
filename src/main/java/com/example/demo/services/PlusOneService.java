@@ -37,20 +37,25 @@ public class PlusOneService {
     @Transactional
     public String IncrementPlusOne(int reviewId, int userId) {
 
+        // get review to increment plus one on
         Reviews curReview = reviewsRepository.findByReviewId(reviewId);
 
+        // get user plus one-ing the review
         Users curUser = usersRepository.findByUserId(userId);
 
+        // if either don't exist, return status stating so
         if (curReview == null || curUser == null) {
             return "Review or user not found";
         }
 
+        // if the plus one already exists, don't let the user plus-one it.
         PlusOnes plusOneAlreadyExists = plusOneRepository.findByUserIdAndReviewId(curUser, curReview);
 
         if (plusOneAlreadyExists != null) {
             return "PlusOne already exists in database for user";
         }
 
+        // create plus one object and save it to the database
         PlusOnes plusOneToCreate = new PlusOnes();
 
         plusOneToCreate.setUserId(curUser);
@@ -59,8 +64,11 @@ public class PlusOneService {
 
         plusOneRepository.save(plusOneToCreate);
 
+        // increment the plus one count on the current review (seems dangerous, but this is the only place
+        // in the entire code base where changing both of these values are possible).
         curReview.setPlusOneCount(curReview.getPlusOneCount() + 1);
 
+        // save the review with the updated plus one count
         reviewsRepository.save(curReview);
 
         return "Successfully incremented the +1";
@@ -69,8 +77,10 @@ public class PlusOneService {
     @Transactional
     public String DecrementPlusOne(int reviewId, int userId) {
 
+        // get review to decrement plus one count
         Reviews curReview = reviewsRepository.findByReviewId(reviewId);
 
+        // remaining logic is the same as before
         Users curUser = usersRepository.findByUserId(userId);
 
         if (curReview == null || curUser == null) {
@@ -94,8 +104,10 @@ public class PlusOneService {
 
     @Transactional
     public String IncrementCommentPlusOne(int commentId, int userId) {
+        // get comment to increment plus one count
         Comments curComment = commentsRepository.findByCommentId(commentId);
 
+        // remaining logic is the same as incrementing the plus one on a review
         Users curUser = usersRepository.findByUserId(userId);
 
         if (curComment == null || curUser == null) {
@@ -126,8 +138,10 @@ public class PlusOneService {
     @Transactional
     public String DecrementPlusOneForComment(int commentId, int userId) {
 
+        // get comment to decrement plus one on
         Comments curComment = commentsRepository.findByCommentId(commentId);
 
+        // remaining logic is the same as decrementing the review
         Users curUser = usersRepository.findByUserId(userId);
 
         if (curComment == null || curUser == null) {

@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "Favorite Destinations")
+// Creates favorite destinations table in database and serves as an object for the database response to map to
 public class FavoriteDestinations {
 
     @Id

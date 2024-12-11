@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "Preferences")
+// creates preferences table in the database, and serves as an object for the database response to map to
 public class Preferences {
 
     @Id

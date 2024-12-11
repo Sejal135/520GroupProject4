@@ -17,6 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "Reviews")
+// creates reviews tables in the database, and serves as an object for the database response to map to
 public class Reviews {
 
     @Id

@@ -20,6 +20,8 @@ public class ReviewsControllerREST {
     @Autowired
     CommentsService commentsService;
 
+    // See REST API Documentation on all relevant endpoints
+
     @CrossOrigin
     @GetMapping("/GetAllReviewsForAPlace")
     public List<Reviews> GetAllReviewsForAPlace(@RequestParam int placeId, @RequestParam int resultsPerPage, @RequestParam int page, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")Date datePosted) {

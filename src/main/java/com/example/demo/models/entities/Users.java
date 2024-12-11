@@ -16,6 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "Users")
+// creates users table in the database, and serves as an object for the database response to map to
 public class Users {
 
     @Id

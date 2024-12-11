@@ -40,6 +40,7 @@ public class ReviewsService {
 
         int skip = (page - 1) * resultsPerPage;
 
+        // Gets resultsPerPage reviews after skip of the most recent reviews posted before reviewPostedTimestamp
         String hql =
                 "FROM Reviews reviews " +
                         "JOIN Places places ON places = reviews.placeId " +
@@ -54,6 +55,7 @@ public class ReviewsService {
 
         int skip = (page - 1) * resultsPerPage;
 
+        // gets the resultsPerPage most recent reviews after timestamp after skip left by user corresponding to userId
         String hql =
                 "From Reviews reviews " +
                         "JOIN Users users on users = reviews.reviewerId " +
@@ -66,6 +68,7 @@ public class ReviewsService {
     @Transactional
     public String AddReviewToDatabase(String title, int userId, int placeId, String reviewContents) {
 
+        // Gets the reviews left by user trying to add a review on this place
         String hql =
                 "From Reviews reviews " +
                         "JOIN Users users on users = reviews.reviewerId " +
@@ -73,10 +76,12 @@ public class ReviewsService {
                         "where users.userId = :userId and places.placeId = :placeId";
 
         List<Reviews> reviews = entityManager.createQuery(hql, Reviews.class).setParameter("userId", userId).setParameter("placeId", placeId).getResultList();
+        // user cannot leave more than one review on a place
         if (!reviews.isEmpty()) {
             return "User already has review on this place";
         }
 
+        // initialize reviews, populate with relevant data, save to reviews channel
         Reviews review = new Reviews();
         review.setTitle(title);
         review.setReview(reviewContents);
@@ -97,15 +102,17 @@ public class ReviewsService {
 
     @Transactional
     public String DeleteReviewFromDatabase(int reviewId) {
+        // finds review from database
         Reviews review = reviewsRepository.findByReviewId(reviewId);
+        // gets all comments associated with the review
         List<Comments> commentsList = commentsRepository.findAllByReview(review);
-
+        // gets all plus ones on the review associated with the review
         List<PlusOnes> reviewPlusOnes = plusOneRepository.findAllByReviewId(review);
-
+        // delete comments with foreign key relationship to table
         commentsService.DeleteMultipleCommentsFromDatabase(commentsList);
-
+        // delete plusOnes with foreign key relationship to table
         plusOneRepository.deleteAll(reviewPlusOnes);
-
+        // delete the review
         reviewsRepository.deleteById(reviewId);
         return "Successfully removed review from repository.";
     }

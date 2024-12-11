@@ -40,6 +40,7 @@ public class CommentsService {
 
         int skip = (page - 1) * resultsPerPage;
 
+        // fetches the more recent comments for any given review before the provided timestamp
         String hql =
                 "FROM Comments comments " +
                         "JOIN Reviews reviews ON reviews = comments.review " +
@@ -51,9 +52,11 @@ public class CommentsService {
                 .setParameter("datePosted", datePosted).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
 
+    // adds a comment to the database
     @Transactional
     public String AddCommentToDatabase(int userId, int reviewId, String commentContents) {
 
+        // create comment object
         Comments comment = new Comments();
 
         comment.setCommentTimestamp(new Date());
@@ -62,14 +65,19 @@ public class CommentsService {
 
         comment.setCommentContent(commentContents);
 
+        // find review to post the comment on
         Reviews review = reviewsRepository.findByReviewId(reviewId);
 
+        // set the review property on the comment object
         comment.setReview(review);
 
+        // get the user who posted the review
         Users user = usersRepository.findByUserId(userId);
 
+        // set the user who comented on the review
         comment.setUser(user);
 
+        // add the comment to the database
         commentsRepository.save(comment);
 
         return "Successfully added entry to database";
@@ -78,12 +86,16 @@ public class CommentsService {
     @Transactional
     public String DeleteCommentFromDatabase(int commentId) {
 
+        // find the comment to be deleted
         Comments comment = commentsRepository.findByCommentId(commentId);
 
+        // get all plus ones associated with the comment. There is a foreign key from
+        // plusOnes to comment, so all plusones on the comment must be deleted first
         List<PlusOnes> plusOnesList = plusOneRepository.findAllByCommentId(comment);
 
         plusOneRepository.deleteAll(plusOnesList);
 
+        // delete the comment
         commentsRepository.deleteById(commentId);
         return "Successfully removed review from repository.";
     }
@@ -91,10 +103,13 @@ public class CommentsService {
     @Transactional
     public String DeleteMultipleCommentsFromDatabase(List<Comments> commentIds) {
 
+        // Finds all plus ones to be deleted on all comments
         List<PlusOnes> plusOnesList = plusOneRepository.findAllByCommentIdIn(commentIds);
 
+        //deletes the plusones
         plusOneRepository.deleteAll(plusOnesList);
 
+        // deletes all comments in the list
         commentsRepository.deleteAll(commentIds);
         return "Successfully removed review from repository.";
     }

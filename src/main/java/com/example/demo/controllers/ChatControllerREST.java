@@ -13,6 +13,8 @@ public class ChatControllerREST {
     @Autowired
     GroupChatInfoService groupChatInfoService;
 
+    // See REST API documentation on all relevant endpoints
+
     @CrossOrigin
     @GetMapping("/GetAllGroupChatsInfo")
     public List<GroupChats> listAllGroupChatMessages(@RequestParam int resultsPerPage, @RequestParam int page) {

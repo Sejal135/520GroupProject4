@@ -13,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "Places")
+// creates places table in the database, and serves as an object for the database response to map to
 public class Places {
 
     @Id

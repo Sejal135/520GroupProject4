@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Table(name = "Group Members")
+// Creates group members table in the database, as of now the functionality implemented here is not used
 public class GroupMembers {
 
     @Id

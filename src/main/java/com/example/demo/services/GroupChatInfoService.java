@@ -41,6 +41,7 @@ public class GroupChatInfoService {
 
         int skip = (page - 1) * resultsPerPage;
 
+        // gets every groupchat
         String hql = "FROM GroupChats groupChats ORDER BY groupChats.groupId";
         return entityManager.createQuery(hql, GroupChats.class).setFirstResult(skip).setMaxResults(resultsPerPage).getResultList();
     }
@@ -91,14 +92,17 @@ public class GroupChatInfoService {
 
     @Transactional
     public String CreateGroupChat(int userId, String groupName) {
+        // gets user to create group chat for
         Users user = usersRepository.findByUserId(userId);
 
+        // check if the user has a chat room open already
         GroupChats chatRoomExists = groupChatRepository.findByUserId(user);
 
         if (chatRoomExists != null) {
             return "You can only have one user per chat room, user already has a chat room";
         }
 
+        // if not, create the chat room object, give it a unique room code, and save it to the database
         GroupChats newChatRoom = new GroupChats();
         newChatRoom.setCreatedAt(new Date());
         newChatRoom.setGroupName(groupName);
@@ -114,6 +118,7 @@ public class GroupChatInfoService {
     public String RemoveGroupChat(int userId) {
         Users user = usersRepository.findByUserId(userId);
 
+        // gets chat room to delete and deletes it
         GroupChats chatRoomToDelete = groupChatRepository.findByUserId(user);
         groupChatRepository.delete(chatRoomToDelete);
         return "Successfully removed group chat from group chats.";
@@ -121,6 +126,9 @@ public class GroupChatInfoService {
 
     @Transactional
     public List<GroupChats> GetGroupChatsBySubstring(String groupName, int maxResults) {
+        // gets group chats by substring, and orders them by length. That way, we can search by substring, and all
+        // results will be found. It won't be possible to have a substring that matches the place exactly and it does
+        // not appear as a search result
         String hql =
                 "FROM GroupChats groupChats " +
                         "WHERE groupChats.groupName LIKE :groupName " +

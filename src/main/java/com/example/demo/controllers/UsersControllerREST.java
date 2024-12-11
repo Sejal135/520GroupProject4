@@ -27,6 +27,8 @@ public class   UsersControllerREST {
     @Autowired
     ExplorerHomepageService explorerHomepageService;
 
+    // See REST API Documentation on all relevant endpoints
+
     @CrossOrigin
     @GetMapping("/GetPreferencesForUser")
     public List<Preferences> GetUserPreferences(@RequestParam int userId) {

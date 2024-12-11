@@ -22,6 +22,8 @@ public class PlacesService {
 
     @Transactional
     public List<Places> GetPlacesByPlacenameSubstring(String placename, int resultsLimit, int page) {
+        // Gets places by lowercase variation of a substring of the placename, orders by length to assure
+        // all places can show up
         String hql =
                 "FROM Places places " +
                         "WHERE LOWER(places.placeName) LIKE LOWER(:placename) ORDER BY LENGTH(places.placeName) ASC";

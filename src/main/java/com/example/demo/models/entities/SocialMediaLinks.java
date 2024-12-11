@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "social_media_links")
+// creates the social media links table in the database, currently has no functionality
 public class SocialMediaLinks {
 
     @Id

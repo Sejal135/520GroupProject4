@@ -17,6 +17,8 @@ public class PlacesController {
     @Autowired
     PlacesService placesService;
 
+    // See REST API documentation on all relevant endpoints
+
     @GetMapping("/GetPlacesByPlacename")
     public List<Places> GetPlacesBySubstring(@RequestParam String placename, @RequestParam int resultsPerPage, @RequestParam int page) {
         return placesService.GetPlacesByPlacenameSubstring(placename, resultsPerPage, page);

@@ -12,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "Itinerary Reference")
+// Creates the itinerary reference table, and serves as an object for the database response to map to
 public class ItineraryReferenceTable {
 
     @Id
